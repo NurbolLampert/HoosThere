@@ -1,13 +1,32 @@
-body {
+html, body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #fefefe;
-    color: #333;
+    padding: 0;
+    height: 100%; /* For the sticky footer */
   }
   
-  header, footer {
-    background-color: #e0e0e0;
+  body {
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    color: #000000;
+  }
+  
+  header {
+    background-color: #000000;
+    color: #fff;
     padding: 1em;
+  }
+  
+  footer {
+    background-color: #000000;
+    color: #fff;
+    padding: 1em;
+    flex-shrink: 0; /* ensures footer is always at bottom if content is short */
+  }
+  
+  main {
+    flex: 1 0 auto;
   }
   
   h1, h2, h3 {
@@ -16,7 +35,7 @@ body {
   }
   
   .nav-link {
-    color: #444;
+    color: #000000;
     transition: color 0.3s ease-in-out;
   }
   
@@ -86,3 +105,8 @@ body {
     width: 70px;
     padding: 0.25rem;
   }
+
+  .navbar-brand,
+    .nav-link {
+    color: #fff;
+    }
