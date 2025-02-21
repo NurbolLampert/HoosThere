@@ -53,27 +53,32 @@
 
   <main class="container my-4">
     <h2>Your Profile</h2>
-    <section>
-      <img
-        src="images/yourprofile.jpg"
-        alt="Profile picture of you"
-        class="profile-pic"
-      />
-      <h3>Your Name</h3>
-      <p>
-        This is your personal bio. You can describe yourself, your major,
-        and your interests.
-      </p>
-      <p><strong>City, State of Origin:</strong> Richmond, VA</p>
-      <p><strong>Karma Score:</strong> 7.2</p>
+    <section class="row">
+      <section class="col-4">
+        <img
+          src="images/yourprofile.jpg"
+          alt="Profile picture of you"
+          class="profile-pic"
+        />
+      </section>
+
+      <section class="col-8">
+        <h3>Your Name</h3>
+        <p>
+          This is your personal bio. You can describe yourself, your major,
+          and your interests.
+        </p>
+        <p><strong>City, State of Origin:</strong> Richmond, VA</p>
+        <p><strong>Karma Score:</strong> 7.2</p>
+      </section>
     </section>
 
     <section>
       <h3>Friends List</h3>
       <ul>
-        <li>Erin</li>
-        <li>Nate</li>
-        <li>Lola</li>
+        <li>Erin <a href="#" class="btn btn-danger">Remove</a></li>
+        <li>Nate <a href="#" class="btn btn-danger">Remove</a></li>
+        <li>Lola <a href="#" class="btn btn-danger">Remove</a></li>
       </ul>
     </section>
 
