@@ -1,0 +1,22 @@
+@accent-color: #3498db;
+@default-border-radius: 6px;
+.rounded-box(@radius: 6px) {
+  border-radius: @radius;
+  padding: 15px;
+  border: 1px solid darken(@accent-color, 20%);
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+h2 {
+  color: @accent-color;
+  &:hover {
+    color: darken(@accent-color, 15%);
+  }
+}
+.alert {
+  .rounded-box(@default-border-radius);
+}
+
+.card {
+  .rounded-box(8px); // override radius
+}
