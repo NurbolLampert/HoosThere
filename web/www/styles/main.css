@@ -30,6 +30,7 @@ body {
     height: 150px;
     object-fit: cover;
     border-radius: 50%;
+    margin-bottom: 1rem;
   }
   
   .friend-pic {
@@ -63,3 +64,25 @@ body {
     }
   }
   
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+  
+  .karma-form {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .karma-form select {
+    width: 70px;
+    padding: 0.25rem;
+  }
