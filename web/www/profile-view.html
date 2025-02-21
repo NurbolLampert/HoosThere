@@ -51,50 +51,58 @@
 
   <main class="container my-4">
     <h2>Profile of Chad Wahoo</h2>
-    <section>
-      <img
-        src="images/chad.jpg"
-        alt="Profile picture of Chad Wahoo"
-        class="profile-pic"
-      />
-      <h3>Bio</h3>
-      <p>
-        Hello, I’m Chad Wahoo, a 4th-year UVA student majoring in Economics.
-        Enjoyer of Bodo’s Bagels, UVA Basketball, and spirited debate
-        about the best bar on The Corner.
-      </p>
-      <p><strong>City, State of Origin:</strong> Charlottesville, VA</p>
-      <p><strong>Karma Score:</strong> 8.5</p>
-    </section>
+    <section class="row">
+      <div class="col-4">
+        <img
+          src="images/chad.jpg"
+          alt="Profile picture of Chad Wahoo"
+          class="profile-pic"
+        />
+      </div>
 
+      <div class="col-8">
+        <h3>Bio</h3>
+        <p>
+          Hello, I’m Chad Wahoo, a 4th-year UVA student majoring in Economics.
+          Enjoyer of Bodo’s Bagels, UVA Basketball, and spirited debate
+          about the best bar on The Corner.
+        </p>
+        <p><strong>City, State of Origin:</strong> Charlottesville, VA</p>
+        <p><strong>Karma Score:</strong> 8.5</p>
+      </div>
+    </section>
+   
     <section>
       <h3>Mutual Friends</h3>
-      <ul>
-        <li>
+
+      <section class="row">
+        <div class="col-md-4 p-3">
           <img
             src="images/friend1.jpg"
             alt="Profile picture of mutual friend 1"
             class="friend-pic"
           />
-          Ashley
-        </li>
-        <li>
+          <a href="#" class="link-primary link-underline-opacity-0">Ashley</a>
+          <!-- Link to friend's profile -->
+        </div>
+
+        <div class="col-md-4 p-3">
           <img
             src="images/friend2.jpg"
             alt="Profile picture of mutual friend 2"
             class="friend-pic"
           />
-          Jamal
-        </li>
-        <li>
+          <a href="#" class="link-primary link-underline-opacity-0">Jamal</a>
+        </div>
+
+        <div class="col-md-4 p-3">
           <img
             src="images/friend3.jpg"
             alt="Profile picture of mutual friend 3"
             class="friend-pic"
           />
-          Sofia
-        </li>
-      </ul>
+          <a href="#" class="link-primary link-underline-opacity-0">Sofia</a>
+        </div>
     </section>
   </main>
 
