@@ -1,0 +1,65 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #fefefe;
+    color: #333;
+  }
+  
+  header, footer {
+    background-color: #e0e0e0;
+    padding: 1em;
+  }
+  
+  h1, h2, h3 {
+    font-family: 'Trebuchet MS', sans-serif;
+    margin-bottom: 0.5em;
+  }
+  
+  .nav-link {
+    color: #444;
+    transition: color 0.3s ease-in-out;
+  }
+  
+  .nav-link:hover {
+    color: #007bff; /* Blue highlight */
+    text-decoration: underline;
+  }
+  
+  .profile-pic {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  
+  .friend-pic {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+  }
+  
+  .social-links p {
+    margin-bottom: 0.3em;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0062cc;
+    border-color: #005cbf;
+  }
+  
+  @media (max-width: 600px) {
+    .profile-pic {
+      width: 100px;
+      height: 100px;
+    }
+    .friend-pic {
+      width: 30px;
+      height: 30px;
+    }
+    body {
+      font-size: 0.9rem;
+    }
+  }
+  
