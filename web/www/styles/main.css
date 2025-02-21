@@ -109,4 +109,18 @@ html, body {
   .navbar-brand,
     .nav-link {
     color: #fff;
-    }
+  }
+
+  .btn-danger {
+    color: #fff;
+    border: none;
+    padding: 0.4rem 0.6rem;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    border-radius: 4px;
+  }
+  
+  .btn-danger:hover {
+    background-color: #740000; 
+  }

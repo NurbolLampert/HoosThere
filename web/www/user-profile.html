@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -91,44 +92,42 @@
 
     <section>
       <h3>Friends List</h3>
-
-      <section class="row">
-          <div class="col-md-4 p-3">
-            <img src="stock-profile-images/2f.jpg" alt="friend avatar" class="friend-pic">
-            <a href="#" class="link-primary link-underline-opacity-0">Erin</a>
-            <!-- Link to friend's profile -->
-            <a href="#" class="btn btn-danger">Remove</a>
+      <section class="row" id="friends-list-row">
+          <div class="col-md-4 p-3 d-flex align-items-center friend-col">
+            <img src="stock-profile-images/2f.jpg" alt="friend avatar" class="friend-pic me-2">
+            <a href="#" class="link-primary link-underline-opacity-0 me-2">Erin</a>
+            <button class="btn btn-danger btn-remove">Remove</button>
           </div>
 
-          <div class="col-md-4 p-3">
-            <img src="stock-profile-images/5m.jpg" alt="friend avatar" class="friend-pic">
-            <a href="#" class="link-primary link-underline-opacity-0">Nate</a>
-            <a href="#" class="btn btn-danger">Remove</a>
+          <div class="col-md-4 p-3 d-flex align-items-center friend-col">
+            <img src="stock-profile-images/5m.jpg" alt="friend avatar" class="friend-pic me-2">
+            <a href="#" class="link-primary link-underline-opacity-0 me-2">Nate</a>
+            <button class="btn btn-danger btn-remove">Remove</button>
           </div>
 
-          <div class="col-md-4 p-3">
-            <img src="stock-profile-images/4m.jpg" alt="friend avatar" class="friend-pic">
-            <a href="#" class="link-primary link-underline-opacity-0">Lola</a>
-            <a href="#" class="btn btn-danger">Remove</a>
+          <div class="col-md-4 p-3 d-flex align-items-center friend-col">
+            <img src="stock-profile-images/4m.jpg" alt="friend avatar" class="friend-pic me-2">
+            <a href="#" class="link-primary link-underline-opacity-0 me-2">Lola</a>
+            <button class="btn btn-danger btn-remove">Remove</button>
           </div>
 
-          <div class="col-md-4 p-3">
-            <img src="stock-profile-images/3m.jpg" alt="friend avatar" class="friend-pic">
-            <a href="#" class="link-primary link-underline-opacity-0">Jim</a>
-            <a href="#" class="btn btn-danger">Remove</a>
+          <div class="col-md-4 p-3 d-flex align-items-center friend-col">
+            <img src="stock-profile-images/3m.jpg" alt="friend avatar" class="friend-pic me-2">
+            <a href="#" class="link-primary link-underline-opacity-0 me-2">Jim</a>
+            <button class="btn btn-danger btn-remove">Remove</button>
           </div>
 
-          <div class="col-md-4 p-3">
-            <img src="stock-profile-images/1f.jpg" alt="friend avatar" class="friend-pic">
-            <a href="#" class="link-primary link-underline-opacity-0">Mikey</a>
-            <a href="#" class="btn btn-danger">Remove</a>
+          <div class="col-md-4 p-3 d-flex align-items-center friend-col">
+            <img src="stock-profile-images/1f.jpg" alt="friend avatar" class="friend-pic me-2">
+            <a href="#" class="link-primary link-underline-opacity-0 me-2">Mikey</a>
+            <button class="btn btn-danger btn-remove">Remove</button>
           </div>
       </section>
     </section>
 
     <section>
       <h3>Find a New Friend</h3>
-      <form action="#" method="post" aria-label="Add new friend form">
+      <form id="add-friend-form" action="#" method="post" aria-label="Add new friend form">
         <div class="mb-3">
           <label for="friendName" class="form-label">Name:</label>
           <input
@@ -152,5 +151,58 @@
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
   ></script>
+
+  <!-- JavaScript to handle removing and adding friends -->
+  <script>
+    function attachRemoveHandler(button) {
+      button.addEventListener('click', () => {
+        // Each friend is in a .friend-col <div>, remove that
+        const friendCol = button.closest('.friend-col');
+        friendCol.remove();
+      });
+    }
+
+    // Grab all existing remove buttons
+    const existingRemoveButtons = document.querySelectorAll('.btn-remove');
+    existingRemoveButtons.forEach(btn => attachRemoveHandler(btn));
+
+    const addFriendForm = document.getElementById('add-friend-form');
+    const friendsListRow = document.getElementById('friends-list-row');
+
+    addFriendForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const friendNameInput = document.getElementById('friendName');
+      const newFriendName = friendNameInput.value.trim();
+      if (!newFriendName) return;
+
+      const newFriendDiv = document.createElement('div');
+      newFriendDiv.classList.add('col-md-4', 'p-3', 'd-flex', 'align-items-center', 'friend-col');
+
+      const friendImg = document.createElement('img');
+      friendImg.src = 'stock-profile-images/3m.jpg';
+      friendImg.alt = 'friend avatar';
+      friendImg.classList.add('friend-pic', 'me-2');
+
+      const friendLink = document.createElement('a');
+      friendLink.href = '#';
+      friendLink.classList.add('link-primary', 'link-underline-opacity-0', 'me-2');
+      friendLink.textContent = newFriendName;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.classList.add('btn', 'btn-danger', 'btn-remove');
+      removeBtn.type = 'button';
+      removeBtn.textContent = 'Remove';
+
+      attachRemoveHandler(removeBtn);
+
+      newFriendDiv.appendChild(friendImg);
+      newFriendDiv.appendChild(friendLink);
+      newFriendDiv.appendChild(removeBtn);
+
+      friendsListRow.appendChild(newFriendDiv);
+
+      friendNameInput.value = '';
+    });
+  </script>
 </body>
 </html>
