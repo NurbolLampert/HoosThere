@@ -4,7 +4,7 @@ services:
   db:
     build:
       dockerfile: ./db/Dockerfile
-    container_name: 'hoos_there_db'
+    container_name: 'db_2025'
     restart: on-failure
     ports:
       - 15432:5432
@@ -19,7 +19,7 @@ services:
     build:
       context: ./web/
       dockerfile: ./Dockerfile
-    container_name: 'hoos_there_web'
+    container_name: 'web_2025'
     ports:
       - 8080:80
     volumes:
