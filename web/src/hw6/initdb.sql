@@ -1,5 +1,3 @@
-ALTER DATABASE example SET timezone TO 'America/New_York';
-
 DROP TABLE IF EXISTS hw6_games CASCADE;
 DROP TABLE IF EXISTS hw6_users CASCADE;
 DROP TABLE IF EXISTS hw6_words CASCADE;

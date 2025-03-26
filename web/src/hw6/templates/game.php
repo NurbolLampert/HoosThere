@@ -6,6 +6,9 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
+<?php
+  $stats = $this->getUserStats($_SESSION["user_id"]);
+?>
 <div class="container mt-5">
   <div class="row">
     <div class="col-12 col-md-8 offset-md-2">
@@ -23,7 +26,14 @@
 
           <p><strong>Name:</strong> <?= htmlspecialchars($_SESSION["name"] ?? "Unknown") ?></p>
           <p><strong>Email:</strong> <?= htmlspecialchars($_SESSION["email"] ?? "Unknown") ?></p>
-          <p><strong>Score:</strong> <?= $this->game->getScore() ?></p>
+          <hr>
+          <h5>Stats</h5>
+          <p>Total Games Played: <?= $stats["played"] ?> (Including current)</p>
+          <p>Games Won: <?= $stats["won"] ?> (<?= round($stats["wonPct"],1) ?>%)</p>
+          <p>Highest Score: <?= $stats["highest"] ?></p>
+          <p>Average Score: <?= round($stats["avg"],2) ?></p>
+          <p>Current Score:</strong> <?= $this->game->getScore() ?></p>
+          <hr>
 
           <p><strong>Shuffled Letters:</strong> 
             <span class="fs-4"><?= htmlspecialchars($this->game->getShuffledLetters()) ?></span>
@@ -33,10 +43,10 @@
             <small class="text-muted">
               Only the specific 7-letter word (unshuffled) that started the game 
               will end it if guessed. The dictionary does not list other 7-letter words.
+              (Hint: <mark class="mb-3"><?= htmlspecialchars($this->game->getFirstShuffledLetters()) ?></mark>)
             </small>
           </div>
 
-          <!-- Guess form -->
           <form action="?command=submit" method="post" class="mb-3">
             <div class="mb-3">
               <label for="guess" class="form-label">Enter your guess:</label>

@@ -144,6 +144,7 @@ class AnagramsGame {
     }
 
     public function getShuffledLetters()    { return $this->shuffledLetters; }
+    public function getFirstShuffledLetters()    { return $this->targetWord; }
     public function getScore()             { return $this->score; }
     public function getGuessedWords()      { return $this->guessedWords; }
     public function getInvalidGuessCount() { return $this->invalidGuessCount; }

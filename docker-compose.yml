@@ -23,6 +23,7 @@ services:
     ports:
       - 8080:80
     volumes:
+      - ./db/:/opt/src/
       - ./web/src/:/opt/src/
       - ./web/www/:/var/www/html/
       - ./web/cgi-bin/:/usr/lib/cgi-bin/
