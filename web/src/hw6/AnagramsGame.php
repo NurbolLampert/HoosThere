@@ -21,11 +21,11 @@ class AnagramsGame {
     }
 
     private function loadWordLists() {
-        $words7Path  = __DIR__ . "/data/words7.txt";
-        $jsonPath    = __DIR__ . "/data/word_bank.json";
+        // $words7Path  = __DIR__ . "/data/words7.txt";
+        // $jsonPath    = __DIR__ . "/data/word_bank.json";
 
-        // $words7Path = "/var/www/html/homework/words7.txt";
-        // $jsonPath   = "/var/www/html/homework/word_bank.json";
+        $words7Path = "/var/www/html/homework/words7.txt";
+        $jsonPath   = "/var/www/html/homework/word_bank.json";
 
         if (file_exists($words7Path)) {
             // read each line as a separate word

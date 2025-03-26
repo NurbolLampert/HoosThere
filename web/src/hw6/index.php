@@ -1,6 +1,6 @@
 <?php
 // Published version:
-// https://cs4640.cs.virginia.edu/cqq7gs/hw5/
+// https://cs4640.cs.virginia.edu/cqq7gs/hw6/
 
 // for local run, please move this file to "/web/www" dir
 

@@ -120,12 +120,6 @@ class AnagramsController {
         $name  = $_SESSION["name"]  ?? "";
         $email = $_SESSION["email"] ?? "";
 
-        if ($this->game && !$this->game->isGameOver()) {
-            // No need to start a new one
-            include(__DIR__ . "/templates/game.php");
-            return;
-        }
-
         if ($name === "" || $email === "") {
             $this->errorMessage = "Please provide both name and email!";
             include(__DIR__ . "/templates/welcome.php");
