@@ -1,6 +1,7 @@
 <?php
 
 class AnagramsGame {
+    private $words7 = [];
     private $targetWord;        
     private $shuffledLetters;   
     private $score;

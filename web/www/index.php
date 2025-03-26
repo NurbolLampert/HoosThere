@@ -14,7 +14,7 @@ ini_set("display_errors", 1);
 // that Apache does not serve publicly.  They will be in /opt/src/, which
 // is our src/ directory in Docker.
 spl_autoload_register(function ($classname) {
-        include "/opt/src/hw5/$classname.php";
+        include "/opt/src/hw6/$classname.php";
 });
 
 // CS4640 server
