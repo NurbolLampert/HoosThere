@@ -116,9 +116,9 @@ class AnagramsController {
     }
 
     private function pickNewGlobalWord() {
-        $words7Path = "/var/www/html/homework/words7.txt";
+        $words7Path  = __DIR__ . "/data/words7.txt";
+        // $words7Path = "/var/www/html/homework/words7.txt";
         if (file_exists($words7Path)) {
-            // read each line as a separate word
             $allWords = array_map('trim', file($words7Path));
         }
     
