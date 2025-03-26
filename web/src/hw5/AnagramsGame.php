@@ -12,7 +12,7 @@ class AnagramsGame {
     public function __construct() {
         $this->loadWordLists();
         $this->targetWord = $this->pickRandomWord();
-        $this->shuffledLetters = str_shuffle($this->targetWord);
+        $this->shuffledLetters = $this->targetWord;
 
         $this->score = 0;
         $this->guessedWords = [];
@@ -20,11 +20,11 @@ class AnagramsGame {
     }
 
     private function loadWordLists() {
-        // $words7Path  = __DIR__ . "/data/words7.txt";
-        // $jsonPath    = __DIR__ . "/data/word_bank.json";
+        $words7Path  = __DIR__ . "/data/words7.txt";
+        $jsonPath    = __DIR__ . "/data/word_bank.json";
 
-        $words7Path = "/var/www/html/homework/words7.txt";
-        $jsonPath   = "/var/www/html/homework/word_bank.json";
+        // $words7Path = "/var/www/html/homework/words7.txt";
+        // $jsonPath   = "/var/www/html/homework/word_bank.json";
 
         if (file_exists($words7Path)) {
             // read each line as a separate word
@@ -59,6 +59,19 @@ class AnagramsGame {
             return "You used letters that aren't in the target!";
         }
 
+        $len = strlen($guess);
+
+        if ($len === 7) {
+            if ($guess === strtolower($this->targetWord)) {
+                // Record guess so isGameOver() sees it
+                $this->guessedWords[] = $guess;
+                return "You found the full 7-letter word! Game Over!";
+            } else {
+                $this->invalidGuessCount++;
+                return "That's not the 7-letter target!";
+            }
+        }
+
         // 2) check dictionary
         if (!$this->isWordValid($guess)) {
             $this->invalidGuessCount++;
@@ -73,11 +86,6 @@ class AnagramsGame {
         // 4) valid new guess => record it
         $this->guessedWords[] = $guess;
         $this->score += $this->calculatePoints(strlen($guess));
-
-        // 5) if guess is the 7-letter target, we are done
-        if ($guess === $this->targetWord) {
-            return "You found the full 7-letter word! Game Over!";
-        }
 
         return "Nice! You guessed a valid word.";
     }
