@@ -2,6 +2,8 @@
 // Published version:
 // https://cs4640.cs.virginia.edu/cqq7gs/hw5/
 
+// for local run, please move this file to "/web/www" dir
+
 if (headers_sent()) {
     die("Error: Headers already sent. Cannot redirect.");
 }
