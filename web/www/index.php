@@ -31,6 +31,6 @@ session_start();
 
 $input = array_merge($_GET, $_POST);
 
-$anagrams = new AnagramsDBController($input);
+$controller = new AnagramsController($input);
 
 $anagrams->run();
