@@ -115,6 +115,47 @@ class AnagramsController {
         include(__DIR__ . "/templates/welcome.php");
     }
 
+    private function pickNewGlobalWord() {
+        $words7Path = "/var/www/html/homework/words7.txt";
+        if (file_exists($words7Path)) {
+            // read each line as a separate word
+            $allWords = array_map('trim', file($words7Path));
+        }
+    
+        $maxAttempts = 1000;
+        $attempts = 0;
+    
+        while ($attempts < $maxAttempts) {
+            $attempts++;
+            // pick random from local array
+            $candidate = $allWords[array_rand($allWords)];
+    
+            // check if already in hw6_words
+            $check = $this->db->query("
+              SELECT 1 FROM hw6_words
+              WHERE word = $1
+              LIMIT 1
+            ", $candidate);
+    
+            // if empty => it's new
+            if (!$check || count($check) === 0) {
+                // Insert it so no one can use it again
+                $ins = $this->db->query("
+                  INSERT INTO hw6_words(word) VALUES($1)
+                ", $candidate);
+    
+                if ($ins !== false) {
+                    return $candidate;
+                } else {
+                    // maybe a DB error => skip and keep trying
+                }
+            }
+            // else => candidate is used => continue picking
+        }
+        // If we exhausted attempts, assume no new words found
+        return null;
+    }
+
 
     private function startGame() {
         $name  = $_SESSION["name"]  ?? "";
@@ -122,6 +163,14 @@ class AnagramsController {
 
         if ($name === "" || $email === "") {
             $this->errorMessage = "Please provide both name and email!";
+            include(__DIR__ . "/templates/welcome.php");
+            return;
+        }
+
+
+        $newWord = $this->pickNewGlobalWord();
+        if (!$newWord) {
+            $this->errorMessage = "No new words left! All have been used.";
             include(__DIR__ . "/templates/welcome.php");
             return;
         }
@@ -181,6 +230,13 @@ class AnagramsController {
         if (empty($_SESSION["name"]) || empty($_SESSION["email"])) {
             header("Location: ?command=welcome");
             exit();
+        }
+
+        $newWord = $this->pickNewGlobalWord();
+        if (!$newWord) {
+            $this->errorMessage = "No new words left! All have been used by someone.";
+            include(__DIR__ . "/templates/welcome.php");
+            return;
         }
 
         $this->game = new AnagramsGame();
