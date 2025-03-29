@@ -19,7 +19,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-md navbar-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">Hoo's There</a>
+        <a class="navbar-brand" href="?command=home">Hoo's There</a>
         <button 
           class="navbar-toggler" 
           type="button" 
@@ -56,9 +56,40 @@
   <main class="container my-4">
     <h1>Welcome to Hoo's There!</h1>
     <p>
-      This is our home page. Use the navigation above to explore
-      the different sections of the site.
+      Log in or register to start connecting with your classmates.
     </p>
+
+    <div class="row">
+      <?=$this->showAlert()?>
+    </div>
+
+    <!-- Login Form -->
+    <form action="?command=login" method="post">
+      <div class="mb-3">
+        <label for="name" class="form-label">Email</label>
+        <input
+          type="email" class="form-control" id="email" name="email"
+          aria-describedby="emailHint" required
+        >
+        <div id="emailHint" class="form-text">
+          Must be a UVA (@virginia.edu) email address.
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="name" class="form-label">Password</label>
+        <input
+          type="password" class="form-control" id="password" name="password"
+          aria-describedby="passwordHint" required
+        >
+        <div id="passwordHint" class="form-text">
+          Must be at least 8 characters long and contain at least one symbol.
+          <!-- TODO more password requirements -->
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Log In</button>
+    </form>
   </main>
 
   <footer class="text-center py-3">
