@@ -25,5 +25,5 @@ if ($reset_db) {
 }
 
 // Run the controller
-$controller = new HoosThereController($_GET, $include_path);
+$controller = new HoosThereController($_GET, $include_path, $is_remote);
 $controller->run();

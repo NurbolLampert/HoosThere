@@ -1,10 +1,18 @@
 <?php
 
+/**
+ * Front controller for HoosThere app.
+ */
 class HoosThereController {
 
-    public function __construct($input, $include_path) {
+    public function __construct($input, $include_path, $is_remote) {
         $this->input = $input;
         $this->include_path = $include_path;
+        if ($is_remote) {
+            $this->db = new Database(RemoteConfig::$db);
+        } else {
+            $this->db = new Database(LocalConfig::$db);
+        }
         session_start();
     }
 
@@ -45,19 +53,45 @@ class HoosThereController {
             return;
         }
 
-        // Validate password
         $password = $_POST["password"];
-        if (strlen($password) < 8 || !preg_match("/^\w*[!@#$%^&*()\-=_+?]+\w*$/", $password)) {
-            $this->createAlert("Please provide a secure password.", "danger");
-            $this->redirectPage("home");
-            return;
+
+        // Check if user exists
+        $users = $this->db->query("SELECT * FROM hoos_there_users WHERE email = $1;", $email);
+        if (empty($users)) {
+            // Validate password
+            if (strlen($password) < 8 || !preg_match("/^\w*[!@#$%^&*()\-=_+?]+\w*$/", $password)) {
+                $this->createAlert("Please provide a secure password.", "danger");
+                $this->redirectPage("home");
+                return;
+            }
+            
+            // Create new user
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $this->db->query(
+                "INSERT INTO hoos_there_users (email, password) VALUES ($1, $2)",
+                $email, $hashed_password
+            );
+
+            // Fetch new user
+            $users = $this->db->query("SELECT * FROM hoos_there_users WHERE email = $1;", $email);
+            $user = $users[0];
+            $this->createAlert("Created new user $email.", "success");
+        } else {
+            // Verify password
+            $user = $users[0];
+            if (!password_verify($password, $user["password"])) {
+                $this->createAlert("Incorrect password for user $email.", "danger");
+                header("Location: ?command=welcome");
+                return;
+            }
+
+            $this->createAlert("Logged in as $email.", "success");
         }
 
-        // TODO validate credentials or create user
-        $this->createAlert("Logged in as $email.", "success");
-        $this->redirectPage("home");
-
+        $_SESSION["user_id"] = $user["id"];
+        
         // TODO redirect to own user profile
+        $this->redirectPage("home");
     }
 
     // Create alert that persists to next load
