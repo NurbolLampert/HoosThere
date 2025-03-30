@@ -17,7 +17,11 @@
   ?>
 
   <main class="container my-4">
-    <h1 class="fs-2">Profile of Chad Wahoo</h1>
+    <?php
+      $user = $this->getUserInfo($user_id);
+    ?>
+
+    <h1 class="fs-2"><?=$user["name"]?>'s Profile</h1>
 
     <div class="row">
       <?=$this->showAlert()?>
@@ -33,13 +37,12 @@
       </div>
 
       <div class="col-8">
-        <h2 class="fs-3">Bio</h2>
-        <p>
-          Hello, I’m Chad Wahoo, a 4th-year UVA student majoring in Economics.
-          Enjoyer of Bodo’s Bagels, UVA Basketball, and spirited debate
-          about the best bar on The Corner.
-        </p>
-        <p><strong>City, State of Origin:</strong> Charlottesville, VA</p>
+        <h2 class="fs-3"><?=$user["name"]?></h2>
+        <p><strong>Graduating Year:</strong> <?=$user["year"]?></p>
+        <p><strong>Major:</strong> <?=$user["major"]?></p>
+        <p><strong>Hometown:</strong> <?=$user["hometown"]?></p>
+        <p><strong>Description:</strong></p>
+        <p><?=$user["description"]?></p>
         <p><strong>Karma Score:</strong> 8.5</p>
       </div>
     </section>
