@@ -37,6 +37,10 @@ class HoosThereController {
                 $this->checkLoggedInOrExit();
                 $this->showProfile();
                 break;
+            case "update_profile":
+                $this->checkLoggedInOrExit();
+                $this->updateProfile();
+                break;
             case "home":
             default:
                 $this->showHome();
@@ -154,7 +158,7 @@ class HoosThereController {
 
         // Redirect to user profile
         $_SESSION["user_id"] = $user["id"];
-        $this->redirectPage("profile&id=" . $user["id"]);
+        $this->redirectPage("profile&id=" . $_SESSION["user_id"]);
     }
 
     /**
@@ -183,6 +187,7 @@ class HoosThereController {
         if (!$this->isLoggedIn()) {
             $this->createAlert("You must be logged in to continue.", "danger");
             $this->redirectPage("home");
+            exit();
         }
     }
 
@@ -190,7 +195,7 @@ class HoosThereController {
      * Get all attributes of the user with the specified ID.
      * Defaults to current user.
      */
-    public function getUserInfo($user_id = null) {
+    public function getUserInfo($user_id = null) {        
         if (is_null($user_id)) {
             $user_id = $_SESSION["user_id"];
         }
@@ -243,11 +248,50 @@ class HoosThereController {
 
         if ($user_id == $_SESSION["user_id"]) {
             // Show own profile
-            $this->showTemplate("profile_self.php");
-        } else {
+            // Can't use method because $user_id will not be visible
+            include($this->include_path . "/templates/profile_self.php");
+        } else if (!empty($this->getUserInfo($user_id))) {
             // Show other profile
-            $this->showTemplate("profile_other.php");
-        }        
+            include($this->include_path . "/templates/profile_other.php");
+        } else {
+            // User does not exist
+            $this->createAlert("That user does not exist.", "danger");
+            $this->redirectPage("profile");
+        }
+    }
+
+    /**
+     * Update the current user's profile
+     */
+    private function updateProfile() {
+        // Clean form data
+        if (isset($_POST["major"])) {
+            $major = $_POST["major"];
+        } else {
+            $major = "";
+        }
+
+        if (isset($_POST["hometown"])) {
+            $hometown = $_POST["hometown"];
+        } else {
+            $hometown = "";
+        }
+
+        if (isset($_POST["description"])) {
+            $description = $_POST["description"];
+        } else {
+            $description = "";
+        }
+
+        $this->db->query(
+            "UPDATE hoos_there_users
+            SET major = $1, hometown = $2, description = $3
+            WHERE id = $4",
+            $major, $hometown, $description, $_SESSION["user_id"]
+        );
+
+        // Redirect to user profile
+        $this->redirectPage("profile&id=" . $_SESSION["user_id"]);
     }
 
     // View Helper Methods

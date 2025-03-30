@@ -23,6 +23,10 @@
       <?=$this->showAlert()?>
     </div>
 
+    <?php
+      $user = $this->getUserInfo($user_id);
+    ?>
+
     <section class="row">
       <div class="col-4">
         <img
@@ -33,23 +37,38 @@
       </div>
 
       <div class="col-8">
-        <h2 class="fs-3">Gigachad Wolfgang</h2>
-        <form>
-          <div class="mb-3">
-            <label for="profileBio" class="form-label"><strong>Description</strong></label>
-            <textarea
-              class="form-control" id="profileBio" rows="5"
-              placeholder="This is your personal bio. You can describe yourself, your major, and your interests."
-            ></textarea>
-          </div>
+        <h2 class="fs-3"><?=$user["name"]?></h2>
 
+        <!-- Profile Form -->
+        <form action="?command=update_profile" method="post">
+          <p><strong>Graduating Year:</strong> <?=$user["year"]?></p>
+          
           <div class="row mb-3 align-items-center">
             <div class="col-auto">
-              <label for="profileHometown" class="form-label"><strong>City, State of Origin: </strong></label>
+              <label for="major" class="form-label"><strong>Major: </strong></label>
             </div>
             <div class="col">
-              <input type="email" class="form-control" id="profileHometown" placeholder="Richmond, VA">
+              <input type="text" class="form-control" name="major" id="major" placeholder="Subject"
+              value="<?=$user["major"]?>">
             </div>
+          </div>
+          
+          <div class="row mb-3 align-items-center">
+            <div class="col-auto">
+              <label for="hometown" class="form-label"><strong>Hometown: </strong></label>
+            </div>
+            <div class="col">
+              <input type="text" class="form-control" name="hometown" id="hometown" placeholder="City, ST"
+              value="<?=$user["hometown"]?>">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label"><strong>Description:</strong></label>
+            <textarea
+              class="form-control" name="description" id="description" rows="5"
+              placeholder="This is your personal bio. You can describe yourself, your major, and your interests."
+            ><?=$user["description"]?></textarea>
           </div>
 
           <p><strong>Karma Score:</strong> 7.2</p>

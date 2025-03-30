@@ -19,7 +19,12 @@
         year INT NOT NULL,
         email TEXT NOT NULL UNIQUE,
         password TEXT NOT NULL,
+
+        major TEXT NOT NULL DEFAULT '',
+        hometown TEXT NOT NULL DEFAULT '',
+        description TEXT NOT NULL DEFAULT '',
         CHECK (year > 0)
+        
     );");
 
     echo "Success setting up database<br>\n";
