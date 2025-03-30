@@ -27,13 +27,20 @@ class HoosThereController {
             case "login":
                 $this->login();
                 break;
+            case "profile":
+                $this->checkLoggedIn();
+                $this->showProfile();
+                break;
             case "home":
             default:
-            $this->showTemplate("/templates/home.php");
+            $this->showTemplate("home.php");
                 break;
         }
     }
 
+    /**
+     * Log in user or create account.
+     */
     private function login() {
         // Validate form is not empty
         if (
@@ -84,22 +91,54 @@ class HoosThereController {
                 header("Location: ?command=welcome");
                 return;
             }
-
             $this->createAlert("Logged in as $email.", "success");
         }
 
+        // Redirect to user profile
         $_SESSION["user_id"] = $user["id"];
-        
-        // TODO redirect to own user profile
-        $this->redirectPage("home");
+        $this->redirectPage("profile&id=" . $user["id"]);
     }
 
-    // Create alert that persists to next load
+    /** 
+     * Check user is logged in and exit if not.
+     */
+    private function checkLoggedIn() {
+        if (!isset($_SESSION["user_id"]) || !is_numeric($_SESSION["user_id"])) {
+            $this->createAlert("You must be logged in to continue.", "danger");
+            $this->redirectPage("home");
+        }
+    }
+
+    /**
+     * Show the profile of the specified user.
+     */
+    private function showProfile() {
+        // Get id of user to view
+        if (isset($this->input["id"])) {
+            $user_id = $this->input["id"];
+        } else {
+            $user_id = $_SESSION["user_id"]; // Default to own user
+        }
+
+        if ($user_id == $_SESSION["user_id"]) {
+            // Show own profile
+            $this->showTemplate("profile_self.php");
+        } else {
+            // Show other profile
+            $this->showTemplate("profile_other.php");
+        }        
+    }
+
+    /**
+     * Create alert that persists to next load.
+     */
     private function createAlert($message, $type) {
         $_SESSION["alert"] = ["message" => $message, "type" => $type];
     }
 
-    // Print alert in template
+    /**
+     * Print alert in template.
+     */
     public function showAlert() {
         if (!isset($_SESSION["alert"])) return;
 
@@ -113,7 +152,7 @@ class HoosThereController {
     }
 
     private function showTemplate($template) {
-        include($this->include_path . $template);
+        include($this->include_path . "/templates/" . $template);
     }
 
     private function redirectPage($command) {
