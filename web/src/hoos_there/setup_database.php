@@ -15,9 +15,11 @@
     $res = pg_query($dbHandle, "CREATE SEQUENCE hoos_there_users_seq;");
     $res = pg_query($dbHandle, "CREATE TABLE hoos_there_users (
         id INT PRIMARY KEY DEFAULT NEXTVAL('hoos_there_users_seq'),
-        name TEXT NOT NULL DEFAULT 'New User',
+        name TEXT NOT NULL,
+        year INT NOT NULL,
         email TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL
+        password TEXT NOT NULL,
+        CHECK (year > 0)
     );");
 
     echo "Success setting up database<br>\n";

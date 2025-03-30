@@ -29,7 +29,19 @@
     <h2>Create Account</h2>
 
     <!-- Register Form -->
-    <form action="?command=register" method="post">    
+    <form action="?command=register" method="post">
+      <div class="row mb-3">
+        <div class="col-md-6 mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="year" class="form-label">Graduating Year</label>
+          <input type="number" class="form-control" id="year" name="year" required>
+        </div>
+      </div>
+    
       <div class="row mb-3">
         <div class="col-md-6 mb-3">
           <label for="name" class="form-label">Email</label>

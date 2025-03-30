@@ -28,7 +28,12 @@
 
     <h2>User Logout</h2>
     
-    <!-- TODO show current user -->
+    <!-- Show current user -->
+    <?php
+      $user = $this->getUserInfo();
+    ?>
+
+    <p>Currently logged in as <?=$user["name"]?> (<?=$user["email"]?>).<p>
 
     <!-- Logout Button -->
     <a class="btn btn-danger" href="?command=logout">Log Out</a> 

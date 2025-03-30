@@ -44,6 +44,8 @@ class HoosThereController {
         }
     }
 
+    // User Account Methods
+
     /**
      * Log in the user.
      */
@@ -72,16 +74,16 @@ class HoosThereController {
             $this->createAlert("Email not found. Please register a new account.", "danger");
             $this->redirectPage("home&register=0");
             return;
-        } else {
-            // Verify password correct
-            $user = $users[0];
-            if (!password_verify($_POST["password"], $user["password"])) {
-                $this->createAlert("Incorrect password for user $email.", "danger");
-                header("Location: ?command=welcome");
-                return;
-            }
-            $this->createAlert("Logged in as $email.", "success");
         }
+
+        // Verify password correct
+        $user = $users[0];
+        if (!password_verify($_POST["password"], $user["password"])) {
+            $this->createAlert("Incorrect password for user $email.", "danger");
+            header("Location: ?command=welcome");
+            return;
+        }
+        $this->createAlert("Logged in as $email.", "success");
 
         // Redirect to user profile
         $_SESSION["user_id"] = $user["id"];
@@ -92,13 +94,23 @@ class HoosThereController {
      * Create a user account.
      */
     private function register() {
-        // Validate form  is not empty
+        // Validate form is not empty
         if (
+            !isset($_POST["name"]) || empty($_POST["name"]) ||
+            !isset($_POST["year"]) || empty($_POST["year"]) ||
             !isset($_POST["email"]) || empty($_POST["email"]) ||
             !isset($_POST["password"]) || empty($_POST["password"])
         ) {
-            $this->createAlert("Please provide an email and password.", "danger");
-            $this->redirectPage("home");
+            $this->createAlert("Please fill out all fields.", "danger");
+            $this->redirectPage("home&register=1");
+            return;
+        }
+
+        // Validate year is positive int
+        $year = $_POST["year"];
+        if (!is_numeric($year) || intval($year) <= 0) {
+            $this->createAlert("Graduating year must be a positive integer.", "danger");
+            $this->redirectPage("home&register=1");
             return;
         }
 
@@ -106,37 +118,39 @@ class HoosThereController {
         $email = $_POST["email"];
         if (!preg_match("/^\w+@virginia.edu$/", $email)) {
             $this->createAlert("Please provide a UVA email.", "danger");
-            $this->redirectPage("home");
+            $this->redirectPage("home&register=1");
             return;
         }
 
         // Check if user exists
         $users = $this->db->query("SELECT * FROM hoos_there_users WHERE email = $1;", $email);
-        if (empty($users)) {
-            // Validate password requirements
-            $password = $_POST["password"];
-            if (strlen($password) < 8 || !preg_match("/^\w*[!@#$%^&*()\-=_+?]+\w*$/", $password)) {
-                $this->createAlert("Please provide a secure password.", "danger");
-                $this->redirectPage("home");
-                return;
-            }
-            
-            // Create new user
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $this->db->query(
-                "INSERT INTO hoos_there_users (email, password) VALUES ($1, $2)",
-                $email, $hashed_password
-            );
-
-            // Fetch new user
-            $users = $this->db->query("SELECT * FROM hoos_there_users WHERE email = $1;", $email);
-            $user = $users[0];
-            $this->createAlert("Created new user $email.", "success");
-        } else {
+        if (!empty($users)) {
             $this->createAlert("Account already exists. Please login.", "danger");
             $this->redirectPage("home&register=1");
             return;
         }
+
+        // Validate password requirements
+        $password = $_POST["password"];
+        if (strlen($password) < 8 || !preg_match("/^\w*[!@#$%^&*()\-=_+?]+\w*$/", $password)) {
+            $this->createAlert("Please provide a secure password.", "danger");
+            $this->redirectPage("home&register=1");
+            return;
+        }
+        
+        // Create new user
+        $name = $_POST["name"];
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $this->db->query(
+            "INSERT INTO hoos_there_users (name, year, email, password)
+            VALUES ($1, $2, $3, $4)",
+            $name, $year, $email, $hashed_password
+        );
+
+        // Fetch new user
+        $users = $this->db->query("SELECT * FROM hoos_there_users WHERE email = $1;", $email);
+        $user = $users[0];
+        $this->createAlert("Created new user $name with email $email.", "success");
 
         // Redirect to user profile
         $_SESSION["user_id"] = $user["id"];
@@ -152,6 +166,8 @@ class HoosThereController {
         $this->createAlert("Logged out. See you soon!", "success");
         $this->redirectPage("home");
     }
+
+    // Account Helper Methods
 
     /**
      * If the user is logged in.
@@ -169,6 +185,25 @@ class HoosThereController {
             $this->redirectPage("home");
         }
     }
+
+    /**
+     * Get all attributes of the user with the specified ID.
+     * Defaults to current user.
+     */
+    public function getUserInfo($user_id = null) {
+        if (is_null($user_id)) {
+            $user_id = $_SESSION["user_id"];
+        }
+
+        $users = $this->db->query("SELECT * FROM hoos_there_users WHERE id = $1;", $user_id);
+        if (empty($users)) {
+            return array();
+        } else {
+            return $users[0];
+        }
+    }
+
+    // Show View Methods
 
     /**
      * Show the home screen.
@@ -214,6 +249,8 @@ class HoosThereController {
             $this->showTemplate("profile_other.php");
         }        
     }
+
+    // View Helper Methods
 
     /**
      * Create alert that persists to next load.
