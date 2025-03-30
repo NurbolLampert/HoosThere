@@ -27,13 +27,21 @@ class HoosThereController {
             case "login":
                 $this->login();
                 break;
+            case "logout":
+                $this->checkLoggedInOrExit();
+                $this->logout();
+                break;
             case "profile":
-                $this->checkLoggedIn();
+                $this->checkLoggedInOrExit();
                 $this->showProfile();
                 break;
             case "home":
             default:
-            $this->showTemplate("home.php");
+                if ($this->isLoggedIn()) {
+                    $this->showTemplate("home_logged_in.php");
+                } else {
+                    $this->showTemplate("home.php");
+                }
                 break;
         }
     }
@@ -99,11 +107,28 @@ class HoosThereController {
         $this->redirectPage("profile&id=" . $user["id"]);
     }
 
+    /**
+     * Log out user.
+     */
+    private function logOut() {
+        session_destroy();
+        session_start();
+        $this->createAlert("Logged out. See you soon!", "success");
+        $this->redirectPage("home");
+    }
+
+    /**
+     * If the user is logged in.
+     */
+    private function isLoggedIn() {
+        return isset($_SESSION["user_id"]) && is_numeric($_SESSION["user_id"]);
+    }
+
     /** 
      * Check user is logged in and exit if not.
      */
-    private function checkLoggedIn() {
-        if (!isset($_SESSION["user_id"]) || !is_numeric($_SESSION["user_id"])) {
+    private function checkLoggedInOrExit() {
+        if (!$this->isLoggedIn()) {
             $this->createAlert("You must be logged in to continue.", "danger");
             $this->redirectPage("home");
         }

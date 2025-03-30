@@ -18,6 +18,11 @@
 
   <main class="container my-4">
     <h1 class="fs-2">Profile of Chad Wahoo</h1>
+
+    <div class="row">
+      <?=$this->showAlert()?>
+    </div>
+
     <section class="row">
       <div class="col-4">
         <img
