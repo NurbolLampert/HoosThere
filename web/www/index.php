@@ -1,4 +1,9 @@
 <?php
+/**
+ * Names: Nurbol Lampert, Eric Weng
+ * URL: https://cs4640.cs.virginia.edu/qgt7zm/project/index.html
+ */
+
 // For debugging: show errors
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
