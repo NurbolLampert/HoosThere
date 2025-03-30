@@ -26,33 +26,29 @@
       <?=$this->showAlert()?>
     </div>
 
+    <h2>User Login</h2>
+
     <!-- Login Form -->
     <form action="?command=login" method="post">
       <div class="mb-3">
         <label for="name" class="form-label">Email</label>
-        <input
-          type="email" class="form-control" id="email" name="email"
-          aria-describedby="emailHint" required
-        >
-        <div id="emailHint" class="form-text">
-          Must be a UVA (@virginia.edu) email address.
-        </div>
+        <input type="email" class="form-control" id="email" name="email" required>
       </div>
 
       <div class="mb-3">
         <label for="name" class="form-label">Password</label>
-        <input
-          type="password" class="form-control" id="password" name="password"
-          aria-describedby="passwordHint" required
-        >
-        <div id="passwordHint" class="form-text">
-          Must be at least 8 characters long and contain at least one symbol.
-          <!-- TODO more password requirements -->
-        </div>
+        <input type="password" class="form-control" id="password" name="password" required>
       </div>
 
       <button type="submit" class="btn btn-primary">Log In</button>
     </form>
+
+    <hr>
+
+    <!-- Switch to Register -->
+    <p>Don't have an account?</p>
+
+    <a class="btn btn-success" href="?command=home&register=1">Register</a> 
   </main>
 
   <footer class="text-center py-3">

@@ -26,6 +26,10 @@
       <?=$this->showAlert()?>
     </div>
 
+    <h2>User Logout</h2>
+    
+    <!-- TODO show current user -->
+
     <!-- Logout Button -->
     <a class="btn btn-danger" href="?command=logout">Log Out</a> 
   </main>

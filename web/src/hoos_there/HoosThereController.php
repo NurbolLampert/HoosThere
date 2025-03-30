@@ -25,11 +25,13 @@ class HoosThereController {
 
         switch($command) {
             case "login":
-                $this->login();
+                $this->logIn();
+                break;
+            case "register":
+                $this->register();
                 break;
             case "logout":
-                $this->checkLoggedInOrExit();
-                $this->logout();
+                $this->logOut();
                 break;
             case "profile":
                 $this->checkLoggedInOrExit();
@@ -37,20 +39,60 @@ class HoosThereController {
                 break;
             case "home":
             default:
-                if ($this->isLoggedIn()) {
-                    $this->showTemplate("home_logged_in.php");
-                } else {
-                    $this->showTemplate("home.php");
-                }
+                $this->showHome();
                 break;
         }
     }
 
     /**
-     * Log in user or create account.
+     * Log in the user.
      */
-    private function login() {
+    private function logIn() {
         // Validate form is not empty
+        if (
+            !isset($_POST["email"]) || empty($_POST["email"]) ||
+            !isset($_POST["password"]) || empty($_POST["password"])
+        ) {
+            $this->createAlert("Please provide an email and password.", "danger");
+            $this->redirectPage("home");
+            return;
+        }
+
+        // Validate email
+        $email = $_POST["email"];
+        if (!preg_match("/^\w+@virginia.edu$/", $email)) {
+            $this->createAlert("Please provide a UVA email.", "danger");
+            $this->redirectPage("home");
+            return;
+        }        
+
+        // Check if user exists
+        $users = $this->db->query("SELECT * FROM hoos_there_users WHERE email = $1;", $email);
+        if (empty($users)) {
+            $this->createAlert("Email not found. Please register a new account.", "danger");
+            $this->redirectPage("home&register=0");
+            return;
+        } else {
+            // Verify password correct
+            $user = $users[0];
+            if (!password_verify($_POST["password"], $user["password"])) {
+                $this->createAlert("Incorrect password for user $email.", "danger");
+                header("Location: ?command=welcome");
+                return;
+            }
+            $this->createAlert("Logged in as $email.", "success");
+        }
+
+        // Redirect to user profile
+        $_SESSION["user_id"] = $user["id"];
+        $this->redirectPage("profile&id=" . $user["id"]);
+    }
+
+    /**
+     * Create a user account.
+     */
+    private function register() {
+        // Validate form  is not empty
         if (
             !isset($_POST["email"]) || empty($_POST["email"]) ||
             !isset($_POST["password"]) || empty($_POST["password"])
@@ -68,12 +110,11 @@ class HoosThereController {
             return;
         }
 
-        $password = $_POST["password"];
-
         // Check if user exists
         $users = $this->db->query("SELECT * FROM hoos_there_users WHERE email = $1;", $email);
         if (empty($users)) {
-            // Validate password
+            // Validate password requirements
+            $password = $_POST["password"];
             if (strlen($password) < 8 || !preg_match("/^\w*[!@#$%^&*()\-=_+?]+\w*$/", $password)) {
                 $this->createAlert("Please provide a secure password.", "danger");
                 $this->redirectPage("home");
@@ -92,14 +133,9 @@ class HoosThereController {
             $user = $users[0];
             $this->createAlert("Created new user $email.", "success");
         } else {
-            // Verify password
-            $user = $users[0];
-            if (!password_verify($password, $user["password"])) {
-                $this->createAlert("Incorrect password for user $email.", "danger");
-                header("Location: ?command=welcome");
-                return;
-            }
-            $this->createAlert("Logged in as $email.", "success");
+            $this->createAlert("Account already exists. Please login.", "danger");
+            $this->redirectPage("home&register=1");
+            return;
         }
 
         // Redirect to user profile
@@ -108,7 +144,7 @@ class HoosThereController {
     }
 
     /**
-     * Log out user.
+     * Log out the user.
      */
     private function logOut() {
         session_destroy();
@@ -131,6 +167,31 @@ class HoosThereController {
         if (!$this->isLoggedIn()) {
             $this->createAlert("You must be logged in to continue.", "danger");
             $this->redirectPage("home");
+        }
+    }
+
+    /**
+     * Show the home screen.
+     */
+    private function showHome() {
+        if ($this->isLoggedIn()) {
+            // Logout screen
+            $this->showTemplate("home_logged_in.php");
+            return;
+        }
+
+        if (isset($this->input["register"])) {
+            $register = $this->input["register"];
+        } else {
+            $register = false;
+        }
+
+        if ($register) {
+            // Create account screen
+            $this->showTemplate("home_register.php");
+        } else {
+            // Log in screen
+            $this->showTemplate("home.php");
         }
     }
 
