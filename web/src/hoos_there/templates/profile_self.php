@@ -30,7 +30,7 @@
     <section class="row">
       <div class="col-4">
         <img
-          src="profile-avatars/4m.jpg"
+          src="<?=$this->getUserAvatar($user_id)?>"
           alt="Your user avatar"
           class="profile-pic"
         >
@@ -84,31 +84,31 @@
       <div class="row" id="friends-list-row">
           <div class="col-md-4 p-3 d-flex align-items-center friend-col">
             <img src="profile-avatars/2f.jpg" alt="Friend 1 avatar" class="friend-pic me-2">
-            <a href="profile-view.html" class="link-primary link-underline-opacity-0 me-2">Erin</a>
+            <a href="?command=profile" class="link-primary link-underline-opacity-0 me-2">Erin</a>
             <button class="btn btn-danger btn-remove">Remove</button>
           </div>
 
           <div class="col-md-4 p-3 d-flex align-items-center friend-col">
             <img src="profile-avatars/5m.jpg" alt="Friend 2 avatar" class="friend-pic me-2">
-            <a href="profile-view.html" class="link-primary link-underline-opacity-0 me-2">Nate</a>
+            <a href="?command=profile" class="link-primary link-underline-opacity-0 me-2">Nate</a>
             <button class="btn btn-danger btn-remove">Remove</button>
           </div>
 
           <div class="col-md-4 p-3 d-flex align-items-center friend-col">
             <img src="profile-avatars/4m.jpg" alt="Friend 3 avatar" class="friend-pic me-2">
-            <a href="profile-view.html" class="link-primary link-underline-opacity-0 me-2">Lola</a>
+            <a href="?command=profile" class="link-primary link-underline-opacity-0 me-2">Lola</a>
             <button class="btn btn-danger btn-remove">Remove</button>
           </div>
 
           <div class="col-md-4 p-3 d-flex align-items-center friend-col">
             <img src="profile-avatars/3m.jpg" alt="Friend 4 avatar" class="friend-pic me-2">
-            <a href="profile-view.html" class="link-primary link-underline-opacity-0 me-2">Jim</a>
+            <a href="?command=profile" class="link-primary link-underline-opacity-0 me-2">Jim</a>
             <button class="btn btn-danger btn-remove">Remove</button>
           </div>
 
           <div class="col-md-4 p-3 d-flex align-items-center friend-col">
             <img src="profile-avatars/1f.jpg" alt="Friend 5 avatar" class="friend-pic me-2">
-            <a href="profile-view.html" class="link-primary link-underline-opacity-0 me-2">Mikey</a>
+            <a href="?command=profile" class="link-primary link-underline-opacity-0 me-2">Mikey</a>
             <button class="btn btn-danger btn-remove">Remove</button>
           </div>
         </div>
