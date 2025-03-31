@@ -23,6 +23,15 @@ class HoosThereController {
             $command = null;
         }
 
+        if ($this->isLoggedIn()) {
+            // Save user id in cookie
+            // This is obviously insecure and we should probably provide some email/password hash
+            setcookie("user_id", $_SESSION["user_id"], time() + 60 * 60, "/"); // 1 hr
+        } else if (isset($_COOKIE["user_id"]) && !empty($_COOKIE["user_id"])) {
+            // Fetch user id from cookie
+            $_SESSION["user_id"] = $_COOKIE["user_id"];
+        }
+
         switch($command) {
             case "login":
                 $this->logIn();
@@ -167,6 +176,7 @@ class HoosThereController {
     private function logOut() {
         session_destroy();
         session_start();
+        setcookie("user_id", "", 0, "/"); // Clear user id from cookie
         $this->createAlert("Logged out. See you soon!", "success");
         $this->redirectPage("home");
     }
@@ -214,6 +224,7 @@ class HoosThereController {
      * Show the home screen.
      */
     private function showHome() {
+
         if ($this->isLoggedIn()) {
             // Logout screen
             $this->showTemplate("home_logged_in.php");
