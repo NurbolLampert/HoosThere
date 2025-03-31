@@ -1,7 +1,10 @@
 <?php
 /**
- * Names: Nurbol Lampert, Eric Weng
- * URL: https://cs4640.cs.virginia.edu/qgt7zm/project/index.html
+ * Team Mambers:
+ * - Eric Weng (front controller, user accounts)
+ * - Nurbol Lampert (page layout, user socials and academics)
+ * 
+ * Hosted Version: https://cs4640.cs.virginia.edu/qgt7zm/project/index.php
  */
 
 // For debugging: show errors
