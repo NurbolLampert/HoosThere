@@ -50,6 +50,10 @@ class HoosThereController {
                 $this->checkLoggedInOrExit();
                 $this->updateProfile();
                 break;
+            case "user_data":
+                $this->checkLoggedInOrExit();
+                $this->showUserData();
+                break;
             case "home":
             default:
                 $this->showHome();
@@ -280,7 +284,7 @@ class HoosThereController {
     }
 
     /**
-     * Update the current user's profile
+     * Update the current user's profile.
      */
     private function updateProfile() {
         // Clean form data
@@ -311,6 +315,15 @@ class HoosThereController {
 
         // Redirect to user profile
         $this->redirectPage("profile&id=" . $_SESSION["user_id"]);
+    }
+
+    /**
+     * Return the current user's data in JSON form.
+     */
+    private function showUserData() {
+        $data = $this->getUserInfo();
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($data);
     }
 
     // View Helper Methods

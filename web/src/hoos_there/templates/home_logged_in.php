@@ -33,8 +33,9 @@
     <div class="row">
         <div class="col-md-6">
           <div class="mb-3">
-            <h2>Quick Actions</h2>
+            <h2>Account Actions</h2>
             <a class="btn btn-primary" href="?command=profile&id=<?=$user["id"]?>">Edit Profile</a> 
+            <a class="btn btn-secondary" href="?command=user_data">Request Data</a> 
           </div>
 
         <div class="mb-3">
