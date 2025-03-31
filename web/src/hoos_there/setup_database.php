@@ -112,24 +112,47 @@
 
     echo "Success setting up database<br>\n";
 
+    // Insert demo users
 
-    $name = 'Demo User';
-    $year = 2026;
-    $email = 'demo@virginia.edu';
-    $rawPassword = 'demouser123!';
-    $hash = password_hash($rawPassword, PASSWORD_DEFAULT);
+    $users = [
+        [
+            "name" => "Demo User",
+            "year" => "2026",
+            "email" => "demo@virginia.edu",
+            "raw_password" => "demouser123!",
+        ],
+        [
+            "name" => "Foo User",
+            "year" => "2028",
+            "email" => "foo@virginia.edu",
+            "raw_password" => "foobar123!",
+        ],
+        [
+            "name" => "Bar User",
+            "year" => "2024",
+            "email" => "bar@virginia.edu",
+            "raw_password" => "barfoo123!",
+        ]
+    ];
 
-    $checkExisting = pg_query_params($dbHandle, "SELECT * FROM hoos_there_users WHERE email = $1;", [$email]);
-    if (pg_num_rows($checkExisting) === 0) {
-        pg_query_params($dbHandle, "INSERT INTO hoos_there_users (name, year, email, password) VALUES ($1, $2, $3, $4);",
-            [$name, $year, $email, $hash]
-        );
-        echo "Inserted demo user<br>\n";
-    } else {
-        echo "Demo user already exists, skipping insert<br>\n";
+    foreach ($users as $user) {
+        $name = $user["name"];
+        $year = $user["year"];
+        $email = $user["email"];
+        $rawPassword = $user["raw_password"];
+        $hash = password_hash($rawPassword, PASSWORD_DEFAULT);
+
+        $checkExisting = pg_query_params($dbHandle, "SELECT * FROM hoos_there_users WHERE email = $1;", [$email]);
+        if (pg_num_rows($checkExisting) === 0) {
+            pg_query_params($dbHandle, "INSERT INTO hoos_there_users (name, year, email, password) VALUES ($1, $2, $3, $4);",
+                [$name, $year, $email, $hash]
+            );
+            echo "Inserted demo user<br>\n";
+        } else {
+            echo "Demo user already exists, skipping insert<br>\n";
+        }
+        echo "$name, $year, $email, $rawPassword<br>\n";
     }
-
-    echo "'Demo User', 2026, 'demo@virginia.edu', 'demouser123!'<br>\n";
 
     // Look up user_id for demo@virginia.edu
     $res = pg_query_params($dbHandle, "SELECT id FROM hoos_there_users WHERE email = $1;", ['demo@virginia.edu']);
@@ -144,6 +167,7 @@
     ];
     
 
+    // Academics
     foreach ($records as $r) {
         pg_query_params($dbHandle, "INSERT INTO academic_records (user_id, year, term, course_code, course_name, teammate_name, project_title, karma)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
