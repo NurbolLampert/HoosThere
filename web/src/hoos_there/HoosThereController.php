@@ -54,6 +54,10 @@ class HoosThereController {
                 $this->checkLoggedInOrExit();
                 $this->showUserData();
                 break;
+            case "delete_user":
+                $this->checkLoggedInOrExit();
+                $this->deleteUser();
+                break;
             case "home":
             default:
                 $this->showHome();
@@ -182,6 +186,29 @@ class HoosThereController {
         session_start();
         setcookie("user_id", "", 0, "/"); // Clear user id from cookie
         $this->createAlert("Logged out. See you soon!", "success");
+        $this->redirectPage("home");
+    }
+
+    /**
+     * Delete the user's account.
+     */
+    private function deleteUser() {
+        // Validate hidden form input
+        if (!isset($_POST["confirm"]) || $_POST["confirm"] != "1") {
+            $this->createAlert("Please confirm account deletion!", "danger");
+            $this->redirectPage("home");
+            return;
+        }
+
+        $email = $this->getUserInfo()["email"];
+        $user_id = $_SESSION["user_id"];
+
+        session_destroy();
+        session_start();
+        setcookie("user_id", "", 0, "/"); // Clear user id from cookie
+
+        $this->db->query("DELETE FROM hoos_there_users WHERE id = $1;", $user_id);
+        $this->createAlert("Account $email deleted. Sorry so see you go!", "success");
         $this->redirectPage("home");
     }
 

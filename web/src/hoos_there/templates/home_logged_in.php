@@ -31,12 +31,23 @@
     ?>
 
     <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
-            <h2>Account Actions</h2>
-            <a class="btn btn-primary" href="?command=profile&id=<?=$user["id"]?>">Edit Profile</a> 
-            <a class="btn btn-secondary" href="?command=user_data">Request Data</a> 
-          </div>
+      <div class="col-md-6">
+        <div class="mb-3">
+          <h2>Account Actions</h2>
+
+          <a class="btn btn-primary" href="?command=profile&id=<?=$user["id"]?>">Edit Profile</a>
+          <a class="btn btn-secondary" href="?command=user_data">Request Data</a>
+        </div>
+
+        <div class="mb-3">
+          <h3>Account Deletion</h3>
+          <p>Warning: Deleting your account is permanent and cannot be undone!</p>
+
+          <form action="?command=delete_user" method="post">
+            <input type="hidden" name="confirm" value="1">
+            <button type="submit" class="btn btn-danger">Delete Account</button>
+          </form>
+        </div>
 
         <div class="mb-3">
           <h2>User Logout</h2>
