@@ -100,7 +100,7 @@ class HoosThereController {
 
         // Redirect to user profile
         $_SESSION["user_id"] = $user["id"];
-        $this->redirectPage("profile&id=" . $user["id"]);
+        $this->redirectPage("home");
     }
 
     /**
@@ -216,6 +216,14 @@ class HoosThereController {
         } else {
             return $users[0];
         }
+    }
+
+    /**
+     * The the ten most recently registered users.
+     */
+    public function getNewUsers() {
+        $users = $this->db->query("SELECT * FROM hoos_there_users ORDER BY id DESC LIMIT 10");
+        return $users;
     }
 
     // Show View Methods

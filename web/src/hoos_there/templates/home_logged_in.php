@@ -26,17 +26,48 @@
       <?=$this->showAlert()?>
     </div>
 
-    <h2>User Logout</h2>
-    
-    <!-- Show current user -->
     <?php
       $user = $this->getUserInfo();
     ?>
 
-    <p>Currently logged in as <?=$user["name"]?> (<?=$user["email"]?>).<p>
+    <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <h2>Quick Actions</h2>
+            <a class="btn btn-primary" href="?command=profile&id=<?=$user["id"]?>">Edit Profile</a> 
+          </div>
 
-    <!-- Logout Button -->
-    <a class="btn btn-danger" href="?command=logout">Log Out</a> 
+        <div class="mb-3">
+          <h2>User Logout</h2>
+
+          <!-- Show current user -->
+          <p>Currently logged in as <?=$user["name"]?> (<?=$user["email"]?>).<p>
+
+          <!-- Logout Button -->
+          <a class="btn btn-danger" href="?command=logout">Log Out</a> 
+        </div>
+      </div>
+
+      <!-- Show recently registered users -->
+      <div class="col-md-6">
+        <h2>New Users</h2>
+
+        <ul>
+          <?php
+            $users = $this->getNewUsers();
+            foreach ($users as $user) {
+              echo "<li>";
+              echo '<a href="?command=profile&id=' . $user["id"] . '">';
+              echo $user["name"];
+              echo "</a>";
+              echo "</li>";
+            }
+          ?>
+        </ul>
+      </div>
+    </div>
+
+    
   </main>
 
   <footer class="text-center py-3">
