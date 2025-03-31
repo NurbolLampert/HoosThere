@@ -30,7 +30,7 @@
     <section class="row">
       <div class="col-4">
         <img
-          src="profile-avatars/3m.jpg"
+          src="<?=$this->getUserAvatar($user_id)?>"
           alt="Other user avatar"
           class="profile-pic"
         >
@@ -58,7 +58,7 @@
             alt="Mutual friend 1 avatar"
             class="friend-pic"
           >
-          <a href="profile-view.html" class="link-primary link-underline-opacity-0">Ashley</a>
+          <a href="?command=profile" class="link-primary link-underline-opacity-0">Ashley</a>
           <!-- Link to friend's profile -->
         </div>
 
@@ -68,7 +68,7 @@
             alt="Mutual friend 2 avatar"
             class="friend-pic"
           >
-          <a href="profile-view.html" class="link-primary link-underline-opacity-0">Jamal</a>
+          <a href="?command=profile" class="link-primary link-underline-opacity-0">Jamal</a>
         </div>
 
         <div class="col-md-4 p-3">
@@ -77,7 +77,7 @@
             alt="Mutual friend 3 avatar"
             class="friend-pic"
           >
-          <a href="profile-view.html" class="link-primary link-underline-opacity-0">Sofia</a>
+          <a href="?command=profile" class="link-primary link-underline-opacity-0">Sofia</a>
         </div>
       </div>
     </section>

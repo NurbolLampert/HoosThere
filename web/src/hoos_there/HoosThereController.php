@@ -305,7 +305,7 @@ class HoosThereController {
      * Get all attributes of the user with the specified ID.
      * Defaults to current user.
      */
-    public function getUserInfo($user_id = null) {        
+    public function getUserInfo($user_id = null) {
         if (is_null($user_id)) {
             $user_id = $_SESSION["user_id"];
         }
@@ -324,6 +324,15 @@ class HoosThereController {
     public function getNewUsers() {
         $users = $this->db->query("SELECT * FROM hoos_there_users ORDER BY id DESC LIMIT 10");
         return $users;
+    }
+
+    /**
+     * Get the filename of the user avatar.
+     */
+    public function getUserAvatar($user_id) {
+        $avatars = ["1f", "2f", "3m", "4m", "5m"];
+        $avatar = $avatars[(($user_id - 1) % 5)];
+        return "profile-avatars/$avatar.jpg";
     }
 
     // Show View Methods
