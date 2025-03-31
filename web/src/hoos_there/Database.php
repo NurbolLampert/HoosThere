@@ -5,6 +5,8 @@
  */
 class Database {
 
+    private $dbHandle;
+
     public function __construct($config) {
         $this->dbHandle = Database::connect($config);
     }

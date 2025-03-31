@@ -5,6 +5,10 @@
  */
 class HoosThereController {
 
+    private $input;
+    private $include_path;
+    private $db;
+
     public function __construct($input, $include_path, $is_remote) {
         $this->input = $input;
         $this->include_path = $include_path;
