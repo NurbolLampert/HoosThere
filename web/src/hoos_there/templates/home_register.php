@@ -23,7 +23,7 @@
     </p>
 
     <div class="row">
-      <?=$this->showAlert()?>
+      <?php $this->showAlert(); ?>
     </div>
 
     <h2>Create Account</h2>
@@ -44,7 +44,7 @@
     
       <div class="row mb-3">
         <div class="col-md-6 mb-3">
-          <label for="name" class="form-label">Email</label>
+          <label for="email" class="form-label">Email</label>
           <input
             type="email" class="form-control" id="email" name="email"
             aria-describedby="emailHint" required
@@ -55,14 +55,13 @@
         </div>
 
         <div class="col-md-6 mb-3">
-          <label for="name" class="form-label">Password</label>
+          <label for="password" class="form-label">Password</label>
           <input
             type="password" class="form-control" id="password" name="password"
             aria-describedby="passwordHint" required
           >
           <div id="passwordHint" class="form-text">
             Must be at least 8 characters long and contain at least one symbol.
-            <!-- TODO more password requirements -->
           </div>
         </div>
       </div>

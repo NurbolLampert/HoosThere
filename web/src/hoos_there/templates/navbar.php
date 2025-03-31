@@ -19,10 +19,10 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link" href="academics.html">Academics</a>
+            <a class="nav-link" href="?command=academics">Academics</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="social-professional-life.html">Social & Professional Life</a>
+            <a class="nav-link" href="?command=social">Social & Professional Life</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="?command=profile">Profile</a>

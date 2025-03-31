@@ -18,26 +18,36 @@
 
   <main class="container my-4">
     <h1>Welcome to Hoo's There!</h1>
-    <p>
-      Log in or register to start connecting with your classmates.
-    </p>
+    <p>Log in or register to start connecting with your classmates.</p>
 
     <div class="row">
-      <?=$this->showAlert()?>
+      <?php $this->showAlert(); ?>
     </div>
 
     <h2>User Login</h2>
 
     <!-- Login Form -->
-    <form action="?command=login" method="post">
+    <form action="?command=login" method="post" class="mb-4">
       <div class="mb-3">
-        <label for="name" class="form-label">Email</label>
-        <input type="email" class="form-control" id="email" name="email" required>
+        <label for="email" class="form-label">Email</label>
+        <input 
+          type="email" 
+          class="form-control" 
+          id="email" 
+          name="email" 
+          placeholder="your@virginia.edu" 
+          required>
       </div>
 
       <div class="mb-3">
-        <label for="name" class="form-label">Password</label>
-        <input type="password" class="form-control" id="password" name="password" required>
+        <label for="password" class="form-label">Password</label>
+        <input 
+          type="password" 
+          class="form-control" 
+          id="password" 
+          name="password" 
+          placeholder="Enter password" 
+          required>
       </div>
 
       <button type="submit" class="btn btn-primary">Log In</button>
@@ -45,10 +55,10 @@
 
     <hr>
 
-    <!-- Switch to Register -->
-    <p>Don't have an account?</p>
-
-    <a class="btn btn-success" href="?command=home&register=1">Register</a> 
+    <div class="mt-4">
+      <p>Don't have an account? Register now!</p>
+      <a class="btn btn-success" href="?command=home&register=1">Register</a> 
+    </div>
   </main>
 
   <footer class="text-center py-3">

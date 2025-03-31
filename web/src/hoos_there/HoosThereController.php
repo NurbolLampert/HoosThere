@@ -1,5 +1,6 @@
 <?php
-
+require_once("services/AcademicsService.php");
+require_once("services/SocialProfessionalService.php");
 /**
  * Front controller for HoosThere app.
  */
@@ -61,6 +62,70 @@ class HoosThereController {
             case "delete_user":
                 $this->checkLoggedInOrExit();
                 $this->deleteUser();
+                break;
+            case "academics":
+                $this->checkLoggedInOrExit();
+                $this->showAcademics();
+                break;
+            case "update_record":
+                $this->checkLoggedInOrExit();
+                $this->updateAcademicRecord();
+                break;
+            case "add_record":
+                $this->checkLoggedInOrExit();
+                $this->addAcademicRecord();
+                break;
+            case "update_project":
+                $this->checkLoggedInOrExit();
+                $this->updateProject();
+                break;
+            case "add_project":
+                $this->checkLoggedInOrExit();
+                $this->addProject();
+                break;
+            case "update_goals":
+                $this->checkLoggedInOrExit();
+                $this->updateGoals();
+                break;
+            case "social":
+                $this->checkLoggedInOrExit();
+                $this->showSocial();
+                break;
+            case "update_social_links":
+                $this->checkLoggedInOrExit();
+                $this->updateSocialLinks();
+                break;
+            case "add_experience":
+                $this->checkLoggedInOrExit();
+                $this->addExperience();
+                break;
+            case "update_experience":
+                $this->checkLoggedInOrExit();
+                $this->updateExperience();
+                break;
+            case "add_education":
+                $this->checkLoggedInOrExit();
+                $this->addEducation();
+                break;
+            case "update_education":
+                $this->checkLoggedInOrExit();
+                $this->updateEducation();
+                break;
+            case "add_club":
+                $this->checkLoggedInOrExit();
+                $this->addClub();
+                break;
+            case "update_club":
+                $this->checkLoggedInOrExit();
+                $this->updateClub();
+                break;
+            case "add_volunteer":
+                $this->checkLoggedInOrExit();
+                $this->addVolunteer();
+                break;
+            case "update_volunteer":
+                $this->checkLoggedInOrExit();
+                $this->updateVolunteer();
                 break;
             case "home":
             default:
@@ -347,6 +412,209 @@ class HoosThereController {
         // Redirect to user profile
         $this->redirectPage("profile&id=" . $_SESSION["user_id"]);
     }
+
+    private function showAcademics() {
+        $this->checkLoggedInOrExit();
+        $service = new AcademicsService($this->db);
+        $academic_data = $service->getRecords($_SESSION["user_id"]);
+        include($this->include_path . "/templates/academics.php");
+    }
+
+    private function updateAcademicRecord() {
+        $this->checkLoggedInOrExit();
+        if (!isset($_POST["record_id"])) {
+            $this->createAlert("Missing record ID", "danger");
+            $this->redirectPage("academics");
+            return;
+        }
+    
+        $service = new AcademicsService($this->db);
+        $service->updateRecord(
+            $_POST["record_id"],
+            $_POST["course_code"],
+            $_POST["course_name"],
+            $_POST["teammate_name"] ?? '',
+            $_POST["project_title"] ?? '',
+            $_POST["karma"] ?? null
+        );
+    
+        $this->createAlert("Record updated.", "success");
+        $this->redirectPage("academics");
+    }
+
+    private function addAcademicRecord() {
+        $user_id = $_SESSION["user_id"];
+        $year = $_POST["year"];
+        $term = $_POST["term"];
+        $code = $_POST["course_code"];
+        $name = $_POST["course_name"];
+        $teammate = $_POST["teammate_name"] ?? '';
+        $project = $_POST["project_title"] ?? '';
+        $karma = $_POST["karma"] ?? null;
+    
+        $service = new AcademicsService($this->db);
+        $service->insertRecord($user_id, $year, $term, $code, $name, $teammate, $project, $karma);
+    
+        $this->createAlert("New academic record added!", "success");
+        $this->redirectPage("academics");
+    }
+
+
+    private function updateProject() {
+        $user_id = $_SESSION["user_id"];
+        $id = $this->input["id"] ?? null;
+        $title = $_POST["project_title"] ?? '';
+        $desc = $_POST["project_description"] ?? '';
+    
+        if (!$id) {
+            $this->createAlert("Missing project ID.", "danger");
+            $this->redirectPage("academics");
+            return;
+        }
+    
+        $service = new AcademicsService($this->db);
+        $service->updateProject($user_id, $id, $title, $desc);
+    
+        $this->createAlert("Project updated!", "success");
+        $this->redirectPage("academics");
+    }
+    
+    private function addProject() {
+        if (!isset($_POST["project_title"]) || !isset($_POST["description"])) {
+            $this->createAlert("Missing project title or description", "danger");
+            $this->redirectPage("academics");
+            return;
+        }
+    
+        $service = new AcademicsService($this->db);
+        $service->addProject($_SESSION["user_id"], $_POST["project_title"], $_POST["description"]);
+        $this->createAlert("Project added!", "success");
+        $this->redirectPage("academics");
+    }
+    
+    private function updateGoals() {
+        if (!isset($_POST["goal_description"])) {
+            $this->createAlert("Missing goal", "danger");
+            $this->redirectPage("academics");
+            return;
+        }
+    
+        $service = new AcademicsService($this->db);
+        $service->updateGoal($_SESSION["user_id"], $_POST["goal_description"]);
+        $this->createAlert("Goals updated!", "success");
+        $this->redirectPage("academics");
+    }
+    
+    private function showSocial() {
+        $service = new SocialProfessionalService($this->db);
+        $data = $service->getSocialProfessionalData($_SESSION["user_id"]);
+        include($this->include_path . "/templates/social_professional_life.php");
+    }
+    
+    private function updateSocialLinks() {
+        $service = new SocialProfessionalService($this->db);
+        $service->updateSocialLinks(
+            $_SESSION["user_id"],
+            $_POST["instagram"] ?? '',
+            $_POST["linkedin"] ?? '',
+            $_POST["facebook"] ?? ''
+        );
+        $this->createAlert("Social media links updated!", "success");
+        $this->redirectPage("social");
+    }
+    
+    private function addExperience() {
+        $service = new SocialProfessionalService($this->db);
+        $service->addExperience(
+            $_SESSION["user_id"],
+            $_POST["role"] ?? '',
+            $_POST["description"] ?? ''
+        );
+        $this->createAlert("Experience added.", "success");
+        $this->redirectPage("social");
+    }
+    
+    private function updateExperience() {
+        $service = new SocialProfessionalService($this->db);
+        $service->updateExperience(
+            $_POST["id"],
+            $_POST["role"] ?? '',
+            $_POST["description"] ?? ''
+        );
+        $this->createAlert("Experience updated.", "success");
+        $this->redirectPage("social");
+    }
+
+    private function addEducation() {
+        $service = new SocialProfessionalService($this->db);
+        $service->addEducation(
+            $_SESSION["user_id"],
+            $_POST["degree"] ?? '',
+            $_POST["institution"] ?? '',
+            $_POST["expected_graduation"] ?? ''
+        );
+        $this->createAlert("Education added.", "success");
+        $this->redirectPage("social");
+    }
+    
+    private function updateEducation() {
+        $service = new SocialProfessionalService($this->db);
+        $service->updateEducation(
+            $_POST["id"],
+            $_POST["degree"] ?? '',
+            $_POST["institution"] ?? '',
+            $_POST["expected_graduation"] ?? ''
+        );
+        $this->createAlert("Education updated.", "success");
+        $this->redirectPage("social");
+    }
+    
+    private function addClub() {
+        $service = new SocialProfessionalService($this->db);
+        $service->addClub(
+            $_SESSION["user_id"],
+            $_POST["name"] ?? '',
+            $_POST["role"] ?? '',
+            $_POST["year"] ?? ''
+        );
+        $this->createAlert("Club/Organization added.", "success");
+        $this->redirectPage("social");
+    }
+    
+    private function updateClub() {
+        $service = new SocialProfessionalService($this->db);
+        $service->updateClub(
+            $_POST["id"],
+            $_POST["name"] ?? '',
+            $_POST["role"] ?? '',
+            $_POST["year"] ?? ''
+        );
+        $this->createAlert("Club/Organization updated.", "success");
+        $this->redirectPage("social");
+    }
+    
+    private function addVolunteer() {
+        $service = new SocialProfessionalService($this->db);
+        $service->addVolunteer(
+            $_SESSION["user_id"],
+            $_POST["organization"] ?? '',
+            $_POST["description"] ?? ''
+        );
+        $this->createAlert("Volunteer experience added.", "success");
+        $this->redirectPage("social");
+    }
+    
+    private function updateVolunteer() {
+        $service = new SocialProfessionalService($this->db);
+        $service->updateVolunteer(
+            $_POST["id"],
+            $_POST["organization"] ?? '',
+            $_POST["description"] ?? ''
+        );
+        $this->createAlert("Volunteer experience updated.", "success");
+        $this->redirectPage("social");
+    }
+    
 
     /**
      * Return the current user's data in JSON form.
