@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Anagrams Game (JS)</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <style>
+    /* quick centering */
+    #letters { font-size: 2rem; letter-spacing: .5rem; }
+    #feedback { min-height: 2rem; }
+  </style>
+</head>
+<body class="bg-light">
+
+<div class="container py-4">
+
+  <section id="game-section" class="mb-5">
+    <h2>Anagrams Game</h2>
+    <div id="letters" class="my-3"></div>
+    <form id="guess-form" class="d-flex mb-3">
+      <input id="guess-input" type="text" class="form-control me-2" placeholder="Enter guess" required>
+      <button id="guess-btn" class="btn btn-primary me-2">Guess</button>
+      <button type="button" id="shuffle-btn" class="btn btn-secondary me-2">Shuffle</button>
+      <button type="button" id="newgame-btn" class="btn btn-success">New Game</button>
+    </form>
+    <div id="feedback" class="mb-3 text-info"></div>
+    <div>
+      <strong>Guessed Words:</strong>
+      <ul id="guessed-list" class="list-unstyled"></ul>
+    </div>
+    <p><strong>Score:</strong> <span id="score">0</span></p>
+  </section>
+
+  <section id="stats-section" class="mb-5">
+    <h2>Game Statistics</h2>
+    <ul>
+      <li>Games played: <span id="stat-played">0</span></li>
+      <li>Highest score: <span id="stat-high">0</span></li>
+      <li>Lowest score: <span id="stat-low">0</span></li>
+      <li>Avg correct words/game: <span id="stat-avg-corr">0</span></li>
+      <li>Avg incorrect words/game: <span id="stat-avg-inc">0</span></li>
+    </ul>
+  </section>
+
+  <section id="clear-section">
+    <button id="clear-btn" class="btn btn-danger">Clear History</button>
+  </section>
+
+</div>
+
+<script src="js/anagrams.js"></script>
+</body>
+</html>
