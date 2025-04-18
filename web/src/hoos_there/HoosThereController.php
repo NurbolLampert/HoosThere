@@ -330,9 +330,8 @@ class HoosThereController {
      * Get the filename of the user avatar.
      */
     public function getUserAvatar($user_id) {
-        $avatars = ["1f", "2f", "3m", "4m", "5m"];
-        $avatar = $avatars[(($user_id - 1) % 5)];
-        return "profile-avatars/$avatar.jpg";
+        $num = (($user_id - 1) % 5) + 1; // 1-10
+        return "profile-avatars/avatar$num.png";
     }
 
     // Show View Methods
