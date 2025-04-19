@@ -35,7 +35,6 @@ async function updateProfile() {
  * Notify the user that their profile was updated.
  */
 function onProfileUpdated(data) {
-    console.log(data);
     if (data.result === "success") {
         createAlert("Profile information updated!", "success");
     } else {

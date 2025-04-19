@@ -410,21 +410,22 @@ class HoosThereController {
             $description = "";
         }
 
+        $user_id = $_SESSION["user_id"];
         $this->db->query(
             "UPDATE hoos_there_users
             SET major = $1, hometown = $2, description = $3
             WHERE id = $4",
-            $major, $hometown, $description, $_SESSION["user_id"]
+            $major, $hometown, $description, $user_id
         );
 
         $data = [
+            "user_id" => $user_id,
             "major" => $major,
             "hometown" => $hometown,
             "description" => $description,
             "result" => "success"
         ];
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($data);
+        $this->showJSONResponse($data);
     }
 
     private function showAcademics() {
@@ -527,14 +528,23 @@ class HoosThereController {
     
     private function updateSocialLinks() {
         $service = new SocialProfessionalService($this->db);
+        $user_id = $_SESSION["user_id"];
+        $instagram = $_POST["instagram"] ?? '';
+        $linkedin = $_POST["linkedin"] ?? '';
+        $facebook = $_POST["facebook"] ?? '';
+
         $service->updateSocialLinks(
-            $_SESSION["user_id"],
-            $_POST["instagram"] ?? '',
-            $_POST["linkedin"] ?? '',
-            $_POST["facebook"] ?? ''
+            $user_id, $instagram, $linkedin, $facebook
         );
-        $this->createAlert("Social media links updated!", "success");
-        $this->redirectPage("social");
+
+        $data = [
+            "user_id" => $user_id,
+            "instagram" => $instagram,
+            "linkedin" => $linkedin,
+            "facebook" => $facebook,
+            "result" => "success"
+        ];
+        $this->showJSONResponse($data);
     }
     
     private function addExperience() {
@@ -635,8 +645,7 @@ class HoosThereController {
      */
     private function showUserData() {
         $data = $this->getUserInfo();
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($data);
+        $this->showJSONResponse($data);
     }
 
     // View Helper Methods
@@ -669,6 +678,11 @@ class HoosThereController {
 
     private function redirectPage($command) {
         header("Location: ?command=$command");
+    }
+
+    private function showJSONResponse($obj) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($obj);
     }
 
 }

@@ -21,6 +21,8 @@
       border-bottom: 1px solid #dee2e6;
     }
   </style>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/social-professional.js"></script>
 </head>
 <body>
   <?php $this->showTemplate("navbar.php"); ?>
@@ -33,8 +35,10 @@
           <h2 class="h4 mb-0">Social Media</h2>
         </div>
         <div class="card-body">
-          <?=$this->showAlert()?>
-          <form method="post" action="?command=update_social_links">
+          <div id="social-alerts">
+            <?=$this->showAlert()?>
+          </div>
+          <form>
             <div class="row g-3">
               <div class="col-md-4">
                 <label for="instagram" class="form-label">Instagram</label>
@@ -53,7 +57,7 @@
               </div>
             </div>
             <div class="mt-3">
-              <button class="btn btn-primary" type="submit">Update Links</button>
+              <button class="btn btn-primary" type="submit" onclick="updateSocialLinks(); return false">Update Links</button>
             </div>
           </form>
         </div>
