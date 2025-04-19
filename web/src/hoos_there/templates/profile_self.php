@@ -10,6 +10,8 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
   >
   <link rel="stylesheet" href="styles/main.css">
+  <script src="scripts/main.js"></script>
+  <script src="scripts/update-profile.js"></script>
 </head>
 <body>
   <?php
@@ -19,7 +21,7 @@
   <main class="container my-4">
     <h1 class="fs-2">Your Profile</h1>
 
-    <div class="row">
+    <div class="row" id="alerts">
       <?=$this->showAlert()?>
     </div>
 
@@ -40,7 +42,7 @@
         <h2 class="fs-3"><?=$user["name"]?></h2>
 
         <!-- Profile Form -->
-        <form action="?command=update_profile" method="post">
+        <form>
           <p><strong>Graduating Year:</strong> <?=$user["year"]?></p>
           
           <div class="row mb-3 align-items-center">
@@ -73,7 +75,7 @@
 
           <p><strong>Karma Score:</strong> 7.2</p>
 
-          <button type="submit" class="btn btn-primary">Save Profile</button>
+          <button type="submit" class="btn btn-primary" onclick="updateProfile(); return false">Save Profile</button>
         </form>
       </div>
     </section>

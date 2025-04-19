@@ -417,8 +417,14 @@ class HoosThereController {
             $major, $hometown, $description, $_SESSION["user_id"]
         );
 
-        // Redirect to user profile
-        $this->redirectPage("profile&id=" . $_SESSION["user_id"]);
+        $data = [
+            "major" => $major,
+            "hometown" => $hometown,
+            "description" => $description,
+            "result" => "success"
+        ];
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($data);
     }
 
     private function showAcademics() {
