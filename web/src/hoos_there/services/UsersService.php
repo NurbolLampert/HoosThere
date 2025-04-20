@@ -110,7 +110,8 @@ class UsersService {
         $user1_id = min($user_id, $friend_id);
         $user2_id = max($user_id, $friend_id);
         return $this->db->query("SELECT * FROM hoos_there_friends
-            WHERE user1_id = $1 AND user2_id = $2 LIMIT 1;", $user1_id, $user2_id);
+            WHERE user1_id = $1 AND user2_id = $2 LIMIT 1;",
+            $user1_id, $user2_id);
     }
 
     /**
@@ -120,6 +121,18 @@ class UsersService {
         $user1_id = min($user_id, $friend_id);
         $user2_id = max($user_id, $friend_id);
         $this->db->query("INSERT INTO hoos_there_friends
-            (user1_id, user2_id) VALUES ($user1_id, $user2_id);");
+            (user1_id, user2_id) VALUES ($1, $2);",
+            $user1_id, $user2_id);
+    }
+
+    /**
+     * Remove the two users from each others' friend lists.
+     */
+    public function removeFriends($user_id, $friend_id) {
+        $user1_id = min($user_id, $friend_id);
+        $user2_id = max($user_id, $friend_id);
+        $this->db->query("DELETE FROM hoos_there_friends
+            WHERE user1_id = $1 AND user2_id = $2;",
+            $user1_id, $user2_id);
     }
 }

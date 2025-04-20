@@ -136,6 +136,10 @@ class HoosThereController {
                 $this->checkLoggedInOrReturnFail();
                 $this->addFriend();
                 break;
+            case "remove_friend":
+                $this->checkLoggedInOrReturnFail();
+                $this->removeFriend();
+                break;
             case "home":
             default:
                 $this->showHome();
@@ -684,7 +688,6 @@ class HoosThereController {
         ];
 
         // Add friends
-        $service = new UsersService($this->db);
         $service->addFriends($user_id, $friend_id);
         
         $data = [
@@ -695,6 +698,30 @@ class HoosThereController {
         $this->showJSONResponse($data);
     }
     
+    private function removeFriend() {
+        $user_id = $_SESSION["user_id"];
+
+        // Clean form
+        $friend_id = $_POST["id"] ?? null;
+        if (is_null($friend_id)) {
+            $data = [
+                "result" => "failure"
+            ];
+            $this->showJSONResponse($data);
+            return;
+        }
+
+        // Add friends
+        $service = new UsersService($this->db);
+        $service->removeFriends($user_id, $friend_id);
+        
+        $data = [
+            "user_id" => $user_id,
+            "friend_id" => $friend_id,
+            "result" => "success"
+        ];
+        $this->showJSONResponse($data);
+    }
 
     /**
      * Return the current user's data in JSON form.

@@ -75,9 +75,55 @@ function onAddNewFriend(response) {
         return;
     } else {
         addFriendItem(response.friend);
-        createAlert("Added a new friend!", "success", "friend-alerts");
+        createAlert("Added a new friend. Start connecting!", "success", "friend-alerts");
     }
-    
+}
+
+/**
+ * Remove a friend from the lsit.
+ */
+async function removeFriend(button, friend) {
+    console.log(button);
+    console.log(friend);
+    // Each friend is in a .friend-col <div>, remove that
+    const friendCol = button.closest('.friend-col');
+    friendCol.remove();
+
+    clearAlerts("friend-alerts");
+    var response = await new Promise(resolve => {
+        var request = new XMLHttpRequest();
+        request.open("POST", "./index.php?command=remove_friend", true);
+        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        request.responseType = "json";
+        request.send(`id=${friend.id}`);
+
+        request.addEventListener("load", function () {
+            if (this.status == 200) {
+                resolve(this.response);
+            } else {
+                createAlert("Could not remove that friend.", "danger", "friend-alerts");
+            }
+        });
+
+        request.addEventListener("error", function () {
+            createAlert("Could not remove that friend.", "danger", "friend-alerts");
+        });
+    });
+    // No callback needed
+    onRemoveFriend(response, friend);
+}
+
+/**
+ * Display a notification that a user was unfriended.
+ */
+function onRemoveFriend(response, friend) {
+    console.log(response);
+    if (response.result !== "success") {
+        createAlert("Could not remove that friend.", "danger", "friend-alerts");
+        return;
+    } else {
+        createAlert(`Removed friend ${friend.name}. No hard feelings!`, "success", "friend-alerts");
+    }
 }
 
 
@@ -103,10 +149,8 @@ function addFriendItem(friend) {
     removeBtn.type = 'button';
     removeBtn.textContent = 'Remove';
 
-    removeBtn.addEventListener('click', () => {
-        // Each friend is in a .friend-col <div>, remove that
-        const friendCol = removeBtn.closest('.friend-col');
-        friendCol.remove();
+    removeBtn.addEventListener('click', function() {
+        removeFriend(this, friend)
     });
 
     newFriendDiv.appendChild(friendImg);
