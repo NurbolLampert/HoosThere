@@ -52,7 +52,7 @@ class HoosThereController {
                 $this->showProfile();
                 break;
             case "update_profile":
-                $this->checkLoggedInOrExit();
+                $this->checkLoggedInOrReturnFail();
                 $this->updateProfile();
                 break;
             case "user_data":
@@ -92,7 +92,7 @@ class HoosThereController {
                 $this->showSocial();
                 break;
             case "update_social_links":
-                $this->checkLoggedInOrExit();
+                $this->checkLoggedInOrReturnFail();
                 $this->updateSocialLinks();
                 break;
             case "add_experience":
@@ -291,13 +291,24 @@ class HoosThereController {
     }
 
     /** 
-     * Check user is logged in and exit if not.
+     * Check user is logged in and redirect to the homepage if not.
      */
     private function checkLoggedInOrExit() {
         if (!$this->isLoggedIn()) {
             $this->createAlert("You must be logged in to continue.", "danger");
             $this->redirectPage("home");
-            exit();
+            exit(1);
+        }
+    }
+
+    /** 
+     * Check user is logged in return a JSON failure reponse if not.
+     */
+    private function checkLoggedInOrReturnFail() {
+        if (!$this->isLoggedIn()) {
+            $data = ["result" => "failure"];
+            $this->showJSONResponse($data);
+            exit(1);
         }
     }
 
