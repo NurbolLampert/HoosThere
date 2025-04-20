@@ -651,10 +651,8 @@ class HoosThereController {
             $friend_id = $friend["id"];
         }
 
-        // Check user exists
-        // Cannot friend self
-        // TODO check not already friend
-        if (is_null($friend_id)) {
+        if (is_null($friend_id)) { 
+            // Check user exists
             $data = [
                 "result" => "failure",
                 "message" => "That user does not exist."
@@ -662,14 +660,23 @@ class HoosThereController {
             $this->showJSONResponse($data);
             return;
         } else if ($user_id == $friend_id) {
+            // Check user exists
             $data = [
                 "result" => "failure",
                 "message" => "You cannot friend yourself!"
             ];
             $this->showJSONResponse($data);
             return;
+        } else if (!empty($service->areUsersFriends($user_id, $friend_id))) {
+            // Make sure not already friends
+            $data = [
+                "result" => "failure",
+                "message" => "You are already friends with this user."
+            ];
+            $this->showJSONResponse($data);
+            return;
         }
-
+        
         $friend_json = [
             "id" => $friend_id,
             "name" => $friend["name"],

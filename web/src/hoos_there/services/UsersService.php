@@ -95,11 +95,22 @@ class UsersService {
                 SELECT user1_id AS id FROM hoos_there_friends WHERE user2_id = $1 UNION
                 SELECT user2_id AS id FROM hoos_there_friends WHERE user1_id = $1
             )
-            SELECT id, name FROM hoos_there_users WHERE hoos_there_users.id IN
-                (SELECT id FROM friend_ids)",
+            SELECT id, name FROM hoos_there_users WHERE hoos_there_users.id
+                IN (SELECT id FROM friend_ids)
+                ORDER BY name",
             $user_id
         );
         return $friends;
+    }
+
+    /**
+     * Check if the two users are friends with each other.
+     */
+    public function areUsersFriends($user_id, $friend_id) {
+        $user1_id = min($user_id, $friend_id);
+        $user2_id = max($user_id, $friend_id);
+        return $this->db->query("SELECT * FROM hoos_there_friends
+            WHERE user1_id = $1 AND user2_id = $2 LIMIT 1;", $user1_id, $user2_id);
     }
 
     /**
@@ -108,7 +119,7 @@ class UsersService {
     public function addFriends($user_id, $friend_id) {
         $user1_id = min($user_id, $friend_id);
         $user2_id = max($user_id, $friend_id);
-        $res = $this->db->query("INSERT INTO hoos_there_friends
+        $this->db->query("INSERT INTO hoos_there_friends
             (user1_id, user2_id) VALUES ($user1_id, $user2_id);");
     }
 }
