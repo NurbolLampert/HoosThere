@@ -11,7 +11,11 @@ class UsersService {
      * Look up a user by ID.
      */
     public function getUserByID($user_id) {
-        $users = $this->db->query("SELECT * FROM hoos_there_users WHERE id = $1;", $user_id);
+        // Make sure not to leak password
+        $users = $this->db->query(
+            "SELECT id, name, email, year, major, hometown, description
+            FROM hoos_there_users WHERE id = $1;", $user_id
+        );
         if (empty($users)) return null;
         else return $users[0];
     }
@@ -64,5 +68,21 @@ class UsersService {
     public function getNewUsers() {
         $users = $this->db->query("SELECT * FROM hoos_there_users ORDER BY id DESC LIMIT 10");
         return $users;
+    }
+
+    /**
+     * Get the user's friends list
+     */
+    public function getFriendsList($user_id) {
+        $friends = $this->db->query(
+            "WITH friend_ids AS (
+                SELECT user1_id AS id FROM hoos_there_friends WHERE user2_id = $1 UNION
+                SELECT user2_id AS id FROM hoos_there_friends WHERE user1_id = $1
+            )
+            SELECT id, name FROM hoos_there_users WHERE hoos_there_users.id IN
+                (SELECT id FROM friend_ids)",
+            $user_id
+        );
+        return $friends;
     }
 }

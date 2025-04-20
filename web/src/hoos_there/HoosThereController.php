@@ -128,6 +128,10 @@ class HoosThereController {
                 $this->checkLoggedInOrExit();
                 $this->updateVolunteer();
                 break;
+            case "get_friends":
+                $this->checkLoggedInOrReturnFail();
+                $this->getFriends();
+                break;
             case "home":
             default:
                 $this->showHome();
@@ -607,6 +611,26 @@ class HoosThereController {
         );
         $this->createAlert("Volunteer experience updated.", "success");
         $this->redirectPage("social");
+    }
+
+    private function getFriends() {
+        $user_id = $_SESSION["user_id"];
+        $data = [
+            "user_id" => $user_id,
+            "result" => "success",
+            "friends" => []
+        ];
+
+        // Get friend IDs, names and avatars
+        $service = new UsersService($this->db);
+        $friends = $service->getFriendsList($user_id);
+        foreach ($friends as $friend) {
+            $avatar = $this->getUserAvatar($friend["id"]);
+            $friend["avatar"] = $avatar;
+            $data["friends"][] = $friend;
+        }
+        
+        $this->showJSONResponse($data);
     }
     
 

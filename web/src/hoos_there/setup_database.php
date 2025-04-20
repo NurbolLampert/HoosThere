@@ -13,26 +13,28 @@
     $tables = [
         "volunteering_experiences", "student_organizations", "education_records",
         "professional_experiences", "social_links",
-        "future_goals", "personal_projects", "academic_records", "hoos_there_users"
+        "future_goals", "personal_projects", "academic_records",
+        "hoos_there_users", "hoos_there_friends"
     ];
 
     $sequences = [
         "future_goals_seq", "personal_projects_seq", "academic_records_seq", "hoos_there_users_seq"
     ];
     
-
+    // Drop tables
     foreach ($tables as $table) {
         $res = pg_query($dbHandle, "DROP TABLE IF EXISTS $table CASCADE;");
     }
+
+    // Drop sequences
     foreach ($sequences as $seq) {
         $res = pg_query($dbHandle, "DROP SEQUENCE IF EXISTS $seq CASCADE;");
     }
     
     // Create sequences
-    $res = pg_query($dbHandle, "CREATE SEQUENCE hoos_there_users_seq;");
-    $res = pg_query($dbHandle, "CREATE SEQUENCE academic_records_seq;");
-    $res = pg_query($dbHandle, "CREATE SEQUENCE personal_projects_seq;");
-    $res = pg_query($dbHandle, "CREATE SEQUENCE future_goals_seq;");    
+    foreach ($sequences as $seq) {
+        $res = pg_query($dbHandle, "CREATE SEQUENCE $seq;");
+    } 
 
     $res = pg_query($dbHandle, "CREATE TABLE hoos_there_users (
         id INT PRIMARY KEY DEFAULT NEXTVAL('hoos_there_users_seq'),
@@ -45,7 +47,15 @@
         hometown TEXT NOT NULL DEFAULT '',
         description TEXT NOT NULL DEFAULT '',
         CHECK (year > 0)
-        
+    );");
+
+    $res = pg_query($dbHandle, "CREATE TABLE hoos_there_friends (
+        user1_id INT NOT NULL
+            REFERENCES hoos_there_users(id) ON DELETE CASCADE,
+        user2_id INT NOT NULL
+            REFERENCES hoos_there_users(id) ON DELETE CASCADE,
+        PRIMARY KEY (user1_id, user2_id),
+        CHECK (user1_id < user2_id)
     );");
 
     $res = pg_query($dbHandle, "CREATE TABLE academic_records (
@@ -153,6 +163,14 @@
         }
         echo "$name, $year, $email, $rawPassword<br>\n";
     }
+
+    // Friends
+    $res = pg_query($dbHandle, "INSERT INTO hoos_there_friends
+        (user1_id, user2_id) VALUES (1, 2);");
+    $res = pg_query($dbHandle, "INSERT INTO hoos_there_friends
+        (user1_id, user2_id) VALUES (1, 3);");
+    $res = pg_query($dbHandle, "INSERT INTO hoos_there_friends
+        (user1_id, user2_id) VALUES (2, 3);");
 
     // Look up user_id for demo@virginia.edu
     $res = pg_query_params($dbHandle, "SELECT id FROM hoos_there_users WHERE email = $1;", ['demo@virginia.edu']);

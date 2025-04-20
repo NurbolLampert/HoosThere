@@ -19,6 +19,8 @@
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
     $(document).ready(function() {
+      getFriendsList();
+
       // Add event handlers to all existing remove buttons
       $("button.btn-remove").on("click", function () {
         $(this).parent().remove();

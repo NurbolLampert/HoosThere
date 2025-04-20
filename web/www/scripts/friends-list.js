@@ -1,4 +1,38 @@
 /**
+ * Get the user's friends list.
+ */
+async function getFriendsList() {
+    console.log("get friends");
+    var response = await new Promise(resolve => {
+        var request = new XMLHttpRequest();
+        request.open("GET", "./index.php?command=get_friends", true);
+        request.responseType = "json";
+        request.send();
+
+        request.addEventListener("load", function () {
+            if (this.status == 200) {
+                resolve(this.response);
+            } else {
+                console.log("Request failed.");
+            }
+        });
+
+        request.addEventListener("error", function () {
+            console.log("Request failed.");
+        });
+    });
+    onGetFriendsList(response);
+}
+
+/**
+ * Show the user's friends list on the document.
+ */
+function onGetFriendsList(response) {
+    console.log(response);
+    if (response.result !== "success") return;
+}
+
+/**
  * Add a new friend when submitting the form.
  */
 function addNewFriend() {
