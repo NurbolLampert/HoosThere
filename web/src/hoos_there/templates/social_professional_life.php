@@ -27,6 +27,10 @@
 <body>
   <?php $this->showTemplate("navbar.php"); ?>
   <main class="container my-5">
+
+    <div id="social-alerts">
+      <?=$this->showAlert()?>
+    </div>
     
     <!-- Social Media Section -->
     <section class="form-section">
@@ -35,9 +39,6 @@
           <h2 class="h4 mb-0">Social Media</h2>
         </div>
         <div class="card-body">
-          <div id="social-alerts">
-            <?=$this->showAlert()?>
-          </div>
           <form>
             <div class="row g-3">
               <div class="col-md-4">
