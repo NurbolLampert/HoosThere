@@ -38,9 +38,9 @@ class UsersService {
      */
     public function getUserByEmail($email) {
         $users = $this->db->query(
-            "SELECT id, name, email, year, major, hometown, description
-            FROM hoos_there_users WHERE email = $1 LIMIT 1;", $email)
-            ;
+            // Need to compare password
+            "SELECT id, name, email, password FROM hoos_there_users WHERE email = $1 LIMIT 1;", $email
+        );
         if (empty($users)) return null;
         else return $users[0];
     }
