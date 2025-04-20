@@ -10,11 +10,21 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
   >
   <link rel="stylesheet" href="styles/main.css">
+
   <script src="scripts/main.js"></script>
   <script src="scripts/update-profile.js"></script>
+  <script src="scripts/friends-list.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
-        integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    $(document).ready(function() {
+      // Add event handlers to all existing remove buttons
+      $("button.btn-remove").on("click", function () {
+        $(this).parent().remove();
+      });
+    });
+  </script>
 </head>
 <body>
   <?php
@@ -121,7 +131,7 @@
 
     <section>
       <h3 class="fs-4">Find a New Friend</h3>
-      <form id="add-friend-form" action="#" method="post" aria-label="Add new friend form">
+      <form id="add-friend-form" aria-label="Add new friend form">
         <div class="mb-3">
           <label for="friendName" class="form-label">Name:</label>
           <input
@@ -133,7 +143,8 @@
             required
           >
         </div>
-        <button type="submit" class="btn btn-primary">Add Friend</button>
+
+        <button type="submit" class="btn btn-primary" onclick="addNewFriend(); return false">Add Friend</button>
       </form>
     </section>
   </main>
@@ -144,11 +155,6 @@
 
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-  ></script>
-
-  <!-- JavaScript to handle removing and adding friends -->
-  <script
-    src="scripts/friends-list.js"
   ></script>
 </body>
 </html>
