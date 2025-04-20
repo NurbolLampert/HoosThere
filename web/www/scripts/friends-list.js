@@ -1,3 +1,5 @@
+var numFriends = 0;
+
 /**
  * Get the user's friends list.
  */
@@ -69,7 +71,6 @@ async function addNewFriend() {
  * Update the user's friend list with the new friend.
  */
 function onAddNewFriend(response) {
-    console.log(response);
     if (response.result !== "success") {
         createAlert(response.message, "danger", "friend-alerts");
         return;
@@ -83,11 +84,13 @@ function onAddNewFriend(response) {
  * Remove a friend from the lsit.
  */
 async function removeFriend(button, friend) {
-    console.log(button);
-    console.log(friend);
     // Each friend is in a .friend-col <div>, remove that
     const friendCol = button.closest('.friend-col');
     friendCol.remove();
+
+    // Update heading text
+    numFriends -= 1;
+    document.getElementById("friends-list-text").innerHTML = `Friends List (${numFriends})`;
 
     clearAlerts("friend-alerts");
     var response = await new Promise(resolve => {
@@ -117,7 +120,6 @@ async function removeFriend(button, friend) {
  * Display a notification that a user was unfriended.
  */
 function onRemoveFriend(response, friend) {
-    console.log(response);
     if (response.result !== "success") {
         createAlert("Could not remove that friend.", "danger", "friend-alerts");
         return;
@@ -125,7 +127,6 @@ function onRemoveFriend(response, friend) {
         createAlert(`Removed friend ${friend.name}. No hard feelings!`, "success", "friend-alerts");
     }
 }
-
 
 /**
  * Display the given friend in the page.
@@ -158,4 +159,8 @@ function addFriendItem(friend) {
     newFriendDiv.appendChild(removeBtn);
 
     document.getElementById("friends-list-row").appendChild(newFriendDiv);
+
+    // Update heading text
+    numFriends += 1;
+    document.getElementById("friends-list-text").innerHTML = `Friends List (${numFriends})`;
 }
