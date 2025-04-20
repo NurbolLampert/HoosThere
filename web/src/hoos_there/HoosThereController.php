@@ -1,4 +1,5 @@
 <?php
+require_once("services/UsersService.php");
 require_once("services/AcademicsService.php");
 require_once("services/SocialProfessionalService.php");
 /**
@@ -159,15 +160,15 @@ class HoosThereController {
         }        
 
         // Check if user exists
-        $users = $this->db->query("SELECT * FROM hoos_there_users WHERE email = $1;", $email);
-        if (empty($users)) {
+        $service = new UsersService($this->db);
+        $user = $service->getUserByEmail($email);
+        if (is_null($user)) {
             $this->createAlert("Email not found. Please register a new account.", "danger");
             $this->redirectPage("home&register=0");
             return;
         }
 
         // Verify password correct
-        $user = $users[0];
         if (!password_verify($_POST["password"], $user["password"])) {
             $this->createAlert("Incorrect password for user $email.", "danger");
             header("Location: ?command=welcome");
@@ -213,8 +214,9 @@ class HoosThereController {
         }
 
         // Check if user exists
-        $users = $this->db->query("SELECT * FROM hoos_there_users WHERE email = $1;", $email);
-        if (!empty($users)) {
+        $service = new UsersService($this->db);
+        $user = $service->getUserByEmail($email);
+        if (!is_null($user)) {
             $this->createAlert("Account already exists. Please login.", "danger");
             $this->redirectPage("home&register=1");
             return;
@@ -230,16 +232,7 @@ class HoosThereController {
         
         // Create new user
         $name = $_POST["name"];
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $this->db->query(
-            "INSERT INTO hoos_there_users (name, year, email, password)
-            VALUES ($1, $2, $3, $4)",
-            $name, $year, $email, $hashed_password
-        );
-
-        // Fetch new user
-        $users = $this->db->query("SELECT * FROM hoos_there_users WHERE email = $1;", $email);
-        $user = $users[0];
+        $user = $service->createUser($name, $year, $email, $password);
         $this->createAlert("Created new user $name with email $email.", "success");
 
         // Redirect to user profile
@@ -276,7 +269,8 @@ class HoosThereController {
         session_start();
         setcookie("user_id", "", 0, "/"); // Clear user id from cookie
 
-        $this->db->query("DELETE FROM hoos_there_users WHERE id = $1;", $user_id);
+        $service = new UsersService($this->db);
+        $service->deleteUser($user_id);
         $this->createAlert("Account $email deleted. Sorry so see you go!", "success");
         $this->redirectPage("home");
     }
@@ -321,27 +315,15 @@ class HoosThereController {
             $user_id = $_SESSION["user_id"];
         }
 
-        $users = $this->db->query("SELECT * FROM hoos_there_users WHERE id = $1;", $user_id);
-        if (empty($users)) {
-            return array();
-        } else {
-            return $users[0];
-        }
-    }
-
-    /**
-     * The the ten most recently registered users.
-     */
-    public function getNewUsers() {
-        $users = $this->db->query("SELECT * FROM hoos_there_users ORDER BY id DESC LIMIT 10");
-        return $users;
+        $service = new UsersService($this->db);
+        return $service->getUserByID($user_id);
     }
 
     /**
      * Get the filename of the user avatar.
      */
     public function getUserAvatar($user_id) {
-        $num = (($user_id - 1) % 5) + 1; // 1-10
+        $num = (($user_id - 1) % 10) + 1; // 1-10
         return "profile-avatars/avatar$num.png";
     }
 
@@ -351,7 +333,6 @@ class HoosThereController {
      * Show the home screen.
      */
     private function showHome() {
-
         if ($this->isLoggedIn()) {
             // Logout screen
             $this->showTemplate("home_logged_in.php");
@@ -378,17 +359,13 @@ class HoosThereController {
      */
     private function showProfile() {
         // Get id of user to view
-        if (isset($this->input["id"])) {
-            $user_id = $this->input["id"];
-        } else {
-            $user_id = $_SESSION["user_id"]; // Default to own user
-        }
+        $user_id = $this->input["id"] ?? $_SESSION["user_id"]; // Default to own user
 
         if ($user_id == $_SESSION["user_id"]) {
             // Show own profile
-            // Can't use method because $user_id will not be visible
+            // Can't use helper method because $user_id will not be visible
             include($this->include_path . "/templates/profile_self.php");
-        } else if (!empty($this->getUserInfo($user_id))) {
+        } else if (!is_null($this->getUserInfo($user_id))) {
             // Show other profile
             include($this->include_path . "/templates/profile_other.php");
         } else {
@@ -403,31 +380,13 @@ class HoosThereController {
      */
     private function updateProfile() {
         // Clean form data
-        if (isset($_POST["major"])) {
-            $major = $_POST["major"];
-        } else {
-            $major = "";
-        }
-
-        if (isset($_POST["hometown"])) {
-            $hometown = $_POST["hometown"];
-        } else {
-            $hometown = "";
-        }
-
-        if (isset($_POST["description"])) {
-            $description = $_POST["description"];
-        } else {
-            $description = "";
-        }
-
+        $major = $_POST["major"] ?? "";
+        $hometown = $_POST["hometown"] ?? "";
+        $description = $_POST["description"] ?? "";
         $user_id = $_SESSION["user_id"];
-        $this->db->query(
-            "UPDATE hoos_there_users
-            SET major = $1, hometown = $2, description = $3
-            WHERE id = $4",
-            $major, $hometown, $description, $user_id
-        );
+
+        $service = new UsersService($this->db);
+        $service->updateUserProfile($user_id, $major, $hometown, $description);
 
         $data = [
             "user_id" => $user_id,

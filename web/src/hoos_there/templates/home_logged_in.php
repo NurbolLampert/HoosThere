@@ -66,7 +66,8 @@
 
         <ul>
           <?php
-            $users = $this->getNewUsers();
+            $service = new UsersService($this->db);
+            $users = $service->getNewUsers();
             foreach ($users as $user) {
               echo "<li>";
               echo '<a href="?command=profile&id=' . $user["id"] . '">';
