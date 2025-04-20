@@ -103,6 +103,9 @@
 
     <section>
       <h3 class="fs-4">Find a New Friend</h3>
+
+      <div class="row" id="friend-alerts"></div>
+
       <form id="add-friend-form" aria-label="Add new friend form">
         <div class="mb-3">
           <label for="friendName" class="form-label">Name:</label>

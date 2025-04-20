@@ -21,10 +21,26 @@ class UsersService {
     }
 
     /**
+     * Look up a user by name.
+     */
+    public function getUserByName($name) {
+        // Possible that name is not unique
+        $users = $this->db->query(
+            "SELECT id, name, email, year, major, hometown, description
+            FROM hoos_there_users WHERE name = $1 LIMIT 1;", $name
+        );
+        if (empty($users)) return null;
+        else return $users[0];
+    }
+
+    /**
      * Look up a user by email.
      */
     public function getUserByEmail($email) {
-        $users = $this->db->query("SELECT * FROM hoos_there_users WHERE email = $1 LIMIT 1;", $email);
+        $users = $this->db->query(
+            "SELECT id, name, email, year, major, hometown, description
+            FROM hoos_there_users WHERE email = $1 LIMIT 1;", $email)
+            ;
         if (empty($users)) return null;
         else return $users[0];
     }
@@ -63,15 +79,15 @@ class UsersService {
     }
     
     /**
-     * Get the ten most recently registered users.
+     * Get the most recently registered users.
      */
-    public function getNewUsers() {
-        $users = $this->db->query("SELECT * FROM hoos_there_users ORDER BY id DESC LIMIT 10");
+    public function getNewUsers($count = 10) {
+        $users = $this->db->query("SELECT * FROM hoos_there_users ORDER BY id DESC LIMIT $count");
         return $users;
     }
 
     /**
-     * Get the user's friends list
+     * Get the user's friends list.
      */
     public function getFriendsList($user_id) {
         $friends = $this->db->query(
@@ -84,5 +100,15 @@ class UsersService {
             $user_id
         );
         return $friends;
+    }
+
+    /**
+     * Add the two users to each others' friend lists.
+     */
+    public function addFriends($user_id, $friend_id) {
+        $user1_id = min($user_id, $friend_id);
+        $user2_id = max($user_id, $friend_id);
+        $res = $this->db->query("INSERT INTO hoos_there_friends
+            (user1_id, user2_id) VALUES ($user1_id, $user2_id);");
     }
 }

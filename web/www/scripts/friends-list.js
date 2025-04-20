@@ -2,7 +2,6 @@
  * Get the user's friends list.
  */
 async function getFriendsList() {
-    console.log("get friends");
     var response = await new Promise(resolve => {
         var request = new XMLHttpRequest();
         request.open("GET", "./index.php?command=get_friends", true);
@@ -28,7 +27,6 @@ async function getFriendsList() {
  * Show the user's friends list on the document.
  */
 function onGetFriendsList(response) {
-    console.log(response);
     if (response.result !== "success") return;
     response.friends.forEach(friend => {
         addFriendItem(friend);
@@ -38,21 +36,54 @@ function onGetFriendsList(response) {
 /**
  * Add a new friend when submitting the form.
  */
-function addNewFriend() {
+async function addNewFriend() {
     const friendNameInput = document.getElementById('friendName');
-    const newFriendName = friendNameInput.value.trim();
+    const friendName = friendNameInput.value.trim();
     friendNameInput.value = '';
-    if (!newFriendName) return;
-    // TODO check user exists
+    if (!friendName) return;
 
-    const friend = {
-        id: 0,
-        name: newFriendName,
-        avatar: 'profile-avatars/3m.jpg',
-    }
-    addFriendItem(friend);
+    clearAlerts("friend-alerts");
+    var response = await new Promise(resolve => {
+        var request = new XMLHttpRequest();
+        request.open("POST", "./index.php?command=add_friend", true);
+        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        request.responseType = "json";
+        request.send(`name=${friendName}`);
+
+        request.addEventListener("load", function () {
+            if (this.status == 200) {
+                resolve(this.response);
+            } else {
+                createAlert("Could not add that user as a friend.", "danger", "friend-alerts");
+            }
+        });
+
+        request.addEventListener("error", function () {
+            createAlert("Could not add that user as a friend.", "danger", "friend-alerts");
+        });
+    });
+    onAddNewFriend(response);
 }
 
+/**
+ * Update the user's friend list with the new friend.
+ */
+function onAddNewFriend(response) {
+    console.log(response);
+    if (response.result !== "success") {
+        createAlert(response.message, "danger", "friend-alerts");
+        return;
+    } else {
+        addFriendItem(response.friend);
+        createAlert("Added a new friend!", "success", "friend-alerts");
+    }
+    
+}
+
+
+/**
+ * Display the given friend in the page.
+ */
 function addFriendItem(friend) {
     const newFriendDiv = document.createElement('div');
     newFriendDiv.classList.add('col-md-4', 'p-3', 'd-flex', 'align-items-center', 'friend-col');

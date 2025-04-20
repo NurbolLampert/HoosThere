@@ -132,6 +132,10 @@ class HoosThereController {
                 $this->checkLoggedInOrReturnFail();
                 $this->getFriends();
                 break;
+            case "add_friend":
+                $this->checkLoggedInOrReturnFail();
+                $this->addFriend();
+                break;
             case "home":
             default:
                 $this->showHome();
@@ -630,6 +634,57 @@ class HoosThereController {
             $data["friends"][] = $friend;
         }
         
+        $this->showJSONResponse($data);
+    }
+
+    private function addFriend() {
+        $user_id = $_SESSION["user_id"];
+
+        // Look up friend id by name
+        $name = trim($_POST["name"]) ?? "";
+        $service = new UsersService($this->db);
+        $friend = $service->getUserByName($name);
+        
+        if (is_null($friend)) {
+            $friend_id = null;
+        } else {
+            $friend_id = $friend["id"];
+        }
+
+        // Check user exists
+        // Cannot friend self
+        // TODO check not already friend
+        if (is_null($friend_id)) {
+            $data = [
+                "result" => "failure",
+                "message" => "That user does not exist."
+            ];
+            $this->showJSONResponse($data);
+            return;
+        } else if ($user_id == $friend_id) {
+            $data = [
+                "result" => "failure",
+                "message" => "You cannot friend yourself!"
+            ];
+            $this->showJSONResponse($data);
+            return;
+        }
+
+        $friend_json = [
+            "id" => $friend_id,
+            "name" => $friend["name"],
+            "avatar" => $this->getUserAvatar($friend["id"])
+        ];
+
+        // Add friends
+        $service = new UsersService($this->db);
+        $service->addFriends($user_id, $friend_id);
+        
+        $data = [
+            "user_id" => $user_id,
+            "friend" => $friend_json,
+            "result" => "success"
+        ];
         $this->showJSONResponse($data);
     }
     
