@@ -30,6 +30,9 @@ async function getFriendsList() {
 function onGetFriendsList(response) {
     console.log(response);
     if (response.result !== "success") return;
+    response.friends.forEach(friend => {
+        addFriendItem(friend);
+    });
 }
 
 /**
@@ -38,20 +41,31 @@ function onGetFriendsList(response) {
 function addNewFriend() {
     const friendNameInput = document.getElementById('friendName');
     const newFriendName = friendNameInput.value.trim();
+    friendNameInput.value = '';
     if (!newFriendName) return;
+    // TODO check user exists
 
+    const friend = {
+        id: 0,
+        name: newFriendName,
+        avatar: 'profile-avatars/3m.jpg',
+    }
+    addFriendItem(friend);
+}
+
+function addFriendItem(friend) {
     const newFriendDiv = document.createElement('div');
     newFriendDiv.classList.add('col-md-4', 'p-3', 'd-flex', 'align-items-center', 'friend-col');
 
     const friendImg = document.createElement('img');
-    friendImg.src = 'profile-avatars/3m.jpg';
-    friendImg.alt = 'friend avatar';
+    friendImg.src = friend.avatar;
+    friendImg.alt = `Avatar of ${friend.name}`;
     friendImg.classList.add('friend-pic', 'me-2');
 
     const friendLink = document.createElement('a');
-    friendLink.href = '#';
+    friendLink.href = `index.php?command=profile&id=${friend.id}`;
     friendLink.classList.add('link-primary', 'link-underline-opacity-0', 'me-2');
-    friendLink.textContent = newFriendName;
+    friendLink.textContent = friend.name;
 
     const removeBtn = document.createElement('button');
     removeBtn.classList.add('btn', 'btn-danger', 'btn-remove');
@@ -69,6 +83,4 @@ function addNewFriend() {
     newFriendDiv.appendChild(removeBtn);
 
     document.getElementById("friends-list-row").appendChild(newFriendDiv);
-
-    friendNameInput.value = '';
 }
