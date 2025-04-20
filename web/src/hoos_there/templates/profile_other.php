@@ -10,6 +10,9 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
   >
   <link rel="stylesheet" href="styles/main.css">
+  
+  <script src="scripts/main.js"></script>
+  <script src="scripts/mutual-friends-list.js"></script>  
 </head>
 <body>
   <?php
@@ -47,39 +50,10 @@
       </div>
     </section>
    
-    <!-- Friends Section -->
+    <!-- Mutual Friends Section -->
     <section>
-      <h2 class="fs-3">Mutual Friends</h2>
-
-      <div class="row">
-        <div class="col-md-4 p-3">
-          <img
-            src="profile-avatars/1f.jpg"
-            alt="Mutual friend 1 avatar"
-            class="friend-pic"
-          >
-          <a href="?command=profile" class="link-primary link-underline-opacity-0">Ashley</a>
-          <!-- Link to friend's profile -->
-        </div>
-
-        <div class="col-md-4 p-3">
-          <img
-            src="profile-avatars/5m.jpg"
-            alt="Mutual friend 2 avatar"
-            class="friend-pic"
-          >
-          <a href="?command=profile" class="link-primary link-underline-opacity-0">Jamal</a>
-        </div>
-
-        <div class="col-md-4 p-3">
-          <img
-            src="profile-avatars/2f.jpg"
-            alt="Mutual friend 3 avatar"
-            class="friend-pic"
-          >
-          <a href="?command=profile" class="link-primary link-underline-opacity-0">Sofia</a>
-        </div>
-      </div>
+      <h2 class="fs-3" id="mutual-friends-list-text">Mutual Friends (0)</h2>
+      <div class="row" id="mutual-friends-list-row"></div>
     </section>
   </main>
 
@@ -90,5 +64,8 @@
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
   ></script>
+  <script>
+    getMutualFriendsList();
+  </script>
 </body>
 </html>

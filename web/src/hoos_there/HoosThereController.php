@@ -140,6 +140,10 @@ class HoosThereController {
                 $this->checkLoggedInOrReturnFail();
                 $this->removeFriend();
                 break;
+            case "get_mutual_friends":
+                $this->checkLoggedInOrReturnFail();
+                $this->getMutualFriends();
+                break;
             case "home":
             default:
                 $this->showHome();
@@ -632,6 +636,47 @@ class HoosThereController {
         // Get friend IDs, names and avatars
         $service = new UsersService($this->db);
         $friends = $service->getFriendsList($user_id);
+        foreach ($friends as $friend) {
+            $avatar = $this->getUserAvatar($friend["id"]);
+            $friend["avatar"] = $avatar;
+            $data["friends"][] = $friend;
+        }
+        
+        $this->showJSONResponse($data);
+    }
+
+    private function getMutualFriends() {
+        // Clean form
+        $other_id = $this->input["id"] ?? null;
+        if (is_null($other_id)) {
+            $data = [
+                "result" => "failure"
+            ];
+            $this->showJSONResponse($data);
+            return;
+        }
+
+        // Check user exists
+        $service = new UsersService($this->db);
+        $other = $service->getUserByID($other_id);
+        if (is_null($other)) { 
+            $data = [
+                "result" => "failure"
+            ];
+            $this->showJSONResponse($data);
+            return;
+        }
+        
+        $user_id = $_SESSION["user_id"];
+        $data = [
+            "user_id" => $user_id,
+            "result" => "success",
+            "friends" => []
+        ];
+
+        // Get friend IDs, names and avatars
+        $service = new UsersService($this->db);
+        $friends = $service->getMutualFriendsList($user_id, $other_id);
         foreach ($friends as $friend) {
             $avatar = $this->getUserAvatar($friend["id"]);
             $friend["avatar"] = $avatar;

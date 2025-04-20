@@ -87,7 +87,7 @@ class UsersService {
     }
 
     /**
-     * Get the user's friends list.
+     * Get the logged-in user's friends list.
      */
     public function getFriendsList($user_id) {
         $friends = $this->db->query(
@@ -134,5 +134,27 @@ class UsersService {
         $this->db->query("DELETE FROM hoos_there_friends
             WHERE user1_id = $1 AND user2_id = $2;",
             $user1_id, $user2_id);
+    }
+
+    /**
+     * Get the user's mutual friends list with the logged-in user.
+     */
+    public function getMutualFriendsList($user_id, $other_id) {
+        $friends = $this->db->query(
+            "WITH user_friend_ids AS (
+                SELECT user1_id AS id FROM hoos_there_friends WHERE user2_id = $1 UNION
+                SELECT user2_id AS id FROM hoos_there_friends WHERE user1_id = $1
+            ),
+            other_friend_ids AS (
+                SELECT user1_id AS id FROM hoos_there_friends WHERE user2_id = $2 UNION
+                SELECT user2_id AS id FROM hoos_there_friends WHERE user1_id = $2
+            )
+            SELECT id, name FROM hoos_there_users WHERE hoos_there_users.id
+                IN (SELECT id FROM user_friend_ids INTERSECT
+                    SELECT id FROM other_friend_ids)
+                ORDER BY name",
+            $user_id, $other_id
+        );
+        return $friends;
     }
 }

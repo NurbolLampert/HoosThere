@@ -84,7 +84,7 @@
 
     <!-- Friends Section -->
     <section>
-      <h2 class="fs-3" id="friends-list-text">Friends List</h2>
+      <h2 class="fs-3" id="friends-list-text">Friends List (0)</h2>
       <div class="row" id="friends-list-row"></div>
     </section>
 
