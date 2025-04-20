@@ -178,10 +178,10 @@
 
     $records = [
         [1, 'Fall', 'ECON 2010', 'Microeconomics', 'Aaron', 'ECON Group Project', 8],
-        [1, 'Fall', 'ENWR 1505', 'Writing & Critical Inquiry', null, null, null],
-        [2, 'J-Term', 'STAT 1100', 'Statistics in Everyday Life', null, null, null],
+        [1, 'Fall', 'ENWR 1505', 'Writing & Critical Inquiry', '', '', ''],
+        [2, 'J-Term', 'STAT 1100', 'Statistics in Everyday Life', '', '', ''],
         [3, 'Spring', 'ECON 2020', 'Macroeconomics', 'Caroline', 'Macroeconomics Presentation', 9],
-        [4, 'Spring', 'MATH 1210', 'Applied Calculus I', null, null, null]
+        [4, 'Spring', 'MATH 1210', 'Applied Calculus I', '', '', '']
     ];
     
 

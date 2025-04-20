@@ -41,16 +41,16 @@
                               <form class="row g-2 align-items-center mb-2" method="post" action="?command=update_record">
                                 <input type="hidden" name="record_id" value="<?=htmlspecialchars($record["id"])?>">
                                 <div class="col-auto">
-                                  <input name="course_code" class="form-control" value="<?=htmlspecialchars($record["course_code"])?>">
+                                  <input name="course_code" class="form-control" value="<?=htmlspecialchars($record["course_code"] ?? "")?>">
                                 </div>
                                 <div class="col-auto">
-                                  <input name="course_name" class="form-control" value="<?=htmlspecialchars($record["course_name"])?>">
+                                  <input name="course_name" class="form-control" value="<?=htmlspecialchars($record["course_name"] ?? "")?>">
                                 </div>
                                 <div class="col-auto">
-                                  <input name="teammate_name" class="form-control" value="<?=htmlspecialchars($record["teammate_name"])?>" placeholder="Teammate">
+                                  <input name="teammate_name" class="form-control" value="<?=htmlspecialchars($record["teammate_name"] ?? "")?>" placeholder="Teammate">
                                 </div>
                                 <div class="col-auto">
-                                  <input name="project_title" class="form-control" value="<?=htmlspecialchars($record["project_title"])?>" placeholder="Project Title">
+                                  <input name="project_title" class="form-control" value="<?=htmlspecialchars($record["project_title"] ?? "")?>" placeholder="Project Title">
                                 </div>
                                 <div class="col-auto">
                                   <input name="karma" class="form-control" type="number" min="1" max="10" value="<?=htmlspecialchars($record["karma"])?>">

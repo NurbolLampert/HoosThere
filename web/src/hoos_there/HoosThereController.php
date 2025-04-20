@@ -169,7 +169,7 @@ class HoosThereController {
             $this->createAlert("Please provide a UVA email.", "danger");
             $this->redirectPage("home");
             return;
-        }        
+        }
 
         // Check if user exists
         $service = new UsersService($this->db);
