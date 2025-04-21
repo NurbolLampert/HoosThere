@@ -10,9 +10,6 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
   >
   <link rel="stylesheet" href="styles/main.css">
-  
-  <script src="scripts/main.js"></script>
-  <script src="scripts/mutual-friends-list.js"></script>  
 </head>
 <body>
   <?php
@@ -49,6 +46,50 @@
         <p><strong>Karma Score:</strong> 8.5</p>
       </div>
     </section>
+
+    <section class="mt-4">
+      <h2 class="fs-3">Academic History</h2>
+
+      <div class="accordion" id="yearAccordion">
+        <?php foreach ($acadData["grouped"] as $year=>$terms): ?>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="y<?=$year?>">
+              <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#c<?=$year?>">
+                Year <?=$year?>
+              </button>
+            </h2>
+            <div id="c<?=$year?>" class="accordion-collapse collapse" data-bs-parent="#yearAccordion">
+              <div class="accordion-body">
+                <?php foreach ($terms as $term=>$records): ?>
+                  <h5 class="fw-semibold"><?=$term?> Term</h5>
+                  <ul class="list-group slim mb-3">
+                  <?php foreach ($records as $rec): ?>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><?=$rec["course_code"]?> – <?=$rec["course_name"]?></span>
+                        <span>
+                          <span class="badge bg-info-subtle text-dark">
+                            <?=number_format($rec["karma_avg"],3)?> / 10
+                          </span>
+                          <small class="text-muted">(<?=$rec["karma_votes"]?>)</small>
+
+                          <?php if ($rec["viewer_is_teammate"]): ?>
+                            <button class="btn btn-sm btn-outline-<?= $rec['viewer_rating']===null?'success':'secondary' ?> ms-2 rate-btn"
+                                    data-rec="<?=$rec['id']?>"
+                                    data-my="<?=$rec['viewer_rating'] ?? '' ?>">
+                                <?= $rec['viewer_rating']===null ? 'Rate' : 'Update' ?>
+                            </button>
+                          <?php endif; ?>
+                        </span>
+                    </li>
+                  <?php endforeach; ?>
+                  </ul>
+                <?php endforeach; ?>
+              </div>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    </section>
    
     <!-- Mutual Friends Section -->
     <section>
@@ -67,5 +108,9 @@
   <script>
     getMutualFriendsList();
   </script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/mutual-friends-list.js"></script> 
+  <script src="scripts/karma-rate.js"></script>
+
 </body>
 </html>

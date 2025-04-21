@@ -15,7 +15,7 @@ class HoosThereController {
         $this->input = $input;
         $this->include_path = $include_path;
         if ($is_remote) {
-            $this->db = new Database(RemoteConfig::$db);
+            // $this->db = new Database(RemoteConfig::$db);
         } else {
             $this->db = new Database(LocalConfig::$db);
         }
@@ -128,6 +128,10 @@ class HoosThereController {
                 $this->checkLoggedInOrExit();
                 $this->updateVolunteer();
                 break;
+            case "search_users":
+                $this->checkLoggedInOrReturnFail();
+                $this->searchUsers();
+                break;
             case "get_friends":
                 $this->checkLoggedInOrReturnFail();
                 $this->getFriends();
@@ -144,6 +148,22 @@ class HoosThereController {
                 $this->checkLoggedInOrReturnFail();
                 $this->getMutualFriends();
                 break;
+            case "send_friend_request":
+                $this->checkLoggedInOrReturnFail();
+                $this->sendFriendRequest();       
+                break;
+            case "get_friend_requests":
+                $this->checkLoggedInOrReturnFail();
+                $this->getFriendRequests();       
+                break;
+            case "act_on_request":
+                $this->checkLoggedInOrReturnFail();
+                $this->actOnRequest();            
+                break;
+            case "rate_project":
+                $this->checkLoggedInOrReturnFail();
+                $this->rateProject();
+                break;                
             case "home":
             default:
                 $this->showHome();
@@ -382,7 +402,19 @@ class HoosThereController {
             // Can't use helper method because $user_id will not be visible
             include($this->include_path . "/templates/profile_self.php");
         } else if (!is_null($this->getUserInfo($user_id))) {
-            // Show other profile
+            $acadSvc   = new AcademicsService($this->db);
+            $acadData  = $acadSvc->getRecords($user_id);          // <= grouped, projects, goals
+            $socSvc    = new SocialProfessionalService($this->db);
+        
+            // add teammate flags for the viewer
+            foreach ($acadData["grouped"] as &$terms)
+              foreach ($terms as &$records)
+                foreach ($records as &$r) {
+                  $r["viewer_is_teammate"] = $acadSvc->userIsTeammate($r["id"], $_SESSION["user_id"]);
+                  $mine = $acadSvc->getKarmaSummary($r["id"], $_SESSION["user_id"]);
+                  $r["viewer_rating"] = $mine["my"];  
+                }
+        
             include($this->include_path . "/templates/profile_other.php");
         } else {
             // User does not exist
@@ -451,11 +483,18 @@ class HoosThereController {
         $name = $_POST["course_name"];
         $teammate = $_POST["teammate_name"] ?? '';
         $project = $_POST["project_title"] ?? '';
-        $karma = $_POST["karma"] ?? null;
+        $karma = 0;
     
         $service = new AcademicsService($this->db);
-        $service->insertRecord($user_id, $year, $term, $code, $name, $teammate, $project, $karma);
+        $recordId = $service->insertRecord($user_id, $year, $term, $code, $name, $teammate, $project, $karma);
     
+        if (!empty($_POST["teammate_ids"])) {
+            $idsArr = array_filter(array_map('intval',
+                        explode(',', $_POST["teammate_ids"])));
+            $service->addTeammates($recordId, $idsArr);
+        }
+    
+
         $this->createAlert("New academic record added!", "success");
         $this->redirectPage("academics");
     }
@@ -813,4 +852,81 @@ class HoosThereController {
         echo json_encode($obj);
     }
 
+    private function searchUsers() {
+        $term = trim($this->input["q"] ?? "");
+        $service = new UsersService($this->db);
+        $rows = $service->searchUsers($_SESSION["user_id"], $term);
+        $out = [];
+        foreach ($rows as $r) {
+            $out[] = [
+                "id" => $r["id"],
+                "name" => $r["name"],
+                "is_friend" => $r["is_friend"] === 't', 
+                "avatar" => $this->getUserAvatar($r["id"])
+            ];
+        }
+        $this->showJSONResponse(["result"=>"success", "matches"=>$out]);
+    }
+    
+    private function sendFriendRequest() {
+        $from = $_SESSION["user_id"];
+        $to   = intval($_POST["id"] ?? 0);
+        if (!$to || $from == $to) { $this->showJSONResponse(["result"=>"failure"]); return; }
+    
+        $svc = new UsersService($this->db);
+        $svc->createFriendRequest($from, $to);
+        $this->showJSONResponse(["result"=>"success"]);
+    }
+    
+    private function getFriendRequests() {
+        $svc   = new UsersService($this->db);
+        $rows  = $svc->getIncomingRequests($_SESSION["user_id"]);
+        $out   = [];
+        foreach ($rows as $r) {
+            $out[] = [
+              "id"      => $r["id"],
+              "from_id" => $r["from_user"],
+              "name"    => $r["name"],
+              "avatar"  => $this->getUserAvatar($r["from_user"]),
+              "ago"     => $this->timeAgo($r["created_at"])
+            ];
+        }
+        $this->showJSONResponse(["result"=>"success", "requests"=>$out]);
+    }
+    
+    private function actOnRequest() {
+        $id  = intval($_POST["request_id"] ?? 0);
+        $ok  = ($_POST["action"] ?? '') === 'accept';
+        $svc = new UsersService($this->db);
+        $svc->actOnRequest($id, $ok);
+        $this->showJSONResponse(["result"=>"success"]);
+    }
+    
+    /* helper */
+    private function timeAgo($ts) {
+        $delta = time() - strtotime($ts);
+        if ($delta < 60)               return $delta . " sec";
+        if ($delta < 3600)             return intdiv($delta,60) . " min";
+        if ($delta < 86400)            return intdiv($delta,3600) . " h";
+        return intdiv($delta,86400) . " d";
+    }
+
+    private function rateProject() {
+        $record  = intval($_POST["record_id"] ?? 0);
+        $points  = intval($_POST["points"] ?? -1);
+        $rater   = $_SESSION["user_id"];
+    
+        if ($points < 0 || $points > 10) {
+            $this->showJSONResponse(["result"=>"failure","msg"=>"Bad points"]); return;
+        }
+    
+        $svc = new AcademicsService($this->db);
+        if (!$svc->userIsTeammate($record, $rater)) {
+            $this->showJSONResponse(["result"=>"failure","msg"=>"Not a teammate"]); return;
+        }
+        $svc->saveKarma($record, $rater, $points);
+        $summary = $svc->getKarmaSummary($record);
+        $this->showJSONResponse(["result"=>"success"] + $summary);
+    }
+    
 }

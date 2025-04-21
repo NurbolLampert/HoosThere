@@ -14,7 +14,8 @@
         "volunteering_experiences", "student_organizations", "education_records",
         "professional_experiences", "social_links",
         "future_goals", "personal_projects", "academic_records",
-        "hoos_there_users", "hoos_there_friends"
+        "hoos_there_users", "hoos_there_friends", "hoos_there_friend_requests",
+        "academic_teammates", "academic_karma",
     ];
 
     $sequences = [
@@ -56,6 +57,15 @@
             REFERENCES hoos_there_users(id) ON DELETE CASCADE,
         PRIMARY KEY (user1_id, user2_id),
         CHECK (user1_id < user2_id)
+    );");
+
+    $res = pg_query($dbHandle, "CREATE TABLE hoos_there_friend_requests (
+        id         SERIAL PRIMARY KEY,
+        from_user  INT  REFERENCES hoos_there_users(id) ON DELETE CASCADE,
+        to_user    INT  REFERENCES hoos_there_users(id) ON DELETE CASCADE,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        status     TEXT CHECK (status IN ('pending','accepted','declined')) DEFAULT 'pending',
+        UNIQUE (from_user, to_user)
     );");
 
     $res = pg_query($dbHandle, "CREATE TABLE academic_records (
@@ -120,6 +130,19 @@
         description TEXT
     );");
 
+    $res = pg_query($dbHandle, "CREATE TABLE academic_teammates (
+        record_id INT REFERENCES academic_records(id) ON DELETE CASCADE,
+        teammate_id INT REFERENCES hoos_there_users(id) ON DELETE CASCADE,
+        PRIMARY KEY (record_id, teammate_id)
+    );");
+
+    $res = pg_query($dbHandle, "CREATE TABLE academic_karma (
+        record_id INT  REFERENCES academic_records(id) ON DELETE CASCADE,
+        rater_id  INT  REFERENCES hoos_there_users(id) ON DELETE CASCADE,
+        points    INT  CHECK (points BETWEEN 0 AND 10),
+        PRIMARY KEY (record_id, rater_id)
+    );");
+
     echo "Success setting up database<br>\n";
 
     // Insert demo users
@@ -178,10 +201,10 @@
 
     $records = [
         [1, 'Fall', 'ECON 2010', 'Microeconomics', 'Aaron', 'ECON Group Project', 8],
-        [1, 'Fall', 'ENWR 1505', 'Writing & Critical Inquiry', '', '', ''],
-        [2, 'J-Term', 'STAT 1100', 'Statistics in Everyday Life', '', '', ''],
+        [1, 'Fall', 'ENWR 1505', 'Writing & Critical Inquiry', '', '', 0],
+        [2, 'J-Term', 'STAT 1100', 'Statistics in Everyday Life', '', '', 0],
         [3, 'Spring', 'ECON 2020', 'Macroeconomics', 'Caroline', 'Macroeconomics Presentation', 9],
-        [4, 'Spring', 'MATH 1210', 'Applied Calculus I', '', '', '']
+        [4, 'Spring', 'MATH 1210', 'Applied Calculus I', '', '', 0]
     ];
     
 

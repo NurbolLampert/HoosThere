@@ -10,10 +10,6 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
   >
   <link rel="stylesheet" href="styles/main.css">
-
-  <script src="scripts/main.js"></script>
-  <script src="scripts/update-profile.js"></script>
-  <script src="scripts/friends-list.js"></script>  
 </head>
 <body>
   <?php
@@ -82,32 +78,63 @@
       </div>
     </section>
 
-    <!-- Friends Section -->
-    <section>
-      <h2 class="fs-3" id="friends-list-text">Friends List (0)</h2>
-      <div class="row" id="friends-list-row"></div>
+    <section class="mt-4 section-card">
+      <h2 class="fs-3 d-inline me-2">
+          Friends: <span id="friendCount">0</span>
+      </h2>
+      <button class="btn btn-sm btn-outline-primary"
+              id="openFriendsBtn"
+              data-bs-toggle="modal"
+              data-bs-target="#friendsModal">
+          View Friends
+      </button>
     </section>
 
-    <section>
-      <h3 class="fs-4">Find a New Friend</h3>
-
-      <div class="row" id="friend-alerts"></div>
-
-      <form id="add-friend-form" aria-label="Add new friend form">
-        <div class="mb-3">
-          <label for="friendName" class="form-label">Name:</label>
-          <input
-            type="text"
-            id="friendName"
-            name="friendName"
-            class="form-control"
-            placeholder="Enter a friend's name"
-            required
-          >
+    <div class="modal fade" id="friendsModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Your Friends</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-0">
+            <table class="table table-sm align-middle mb-0 tr-hover">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col"></th>
+                  <th>Name</th>
+                  <th>Grad Year</th>
+                  <th>Major</th>
+                  <th class="text-end"></th>
+                </tr>
+              </thead>
+              <tbody id="friendsTableBody"></tbody>
+            </table>
+          </div>
         </div>
+      </div>
+    </div>
 
-        <button type="submit" class="btn btn-primary" onclick="addNewFriend(); return false">Add Friend</button>
-      </form>
+    <section class="mb-4 section-card">
+      <h3 class="fs-4">Look up Hoos</h3>
+      <input type="search"
+            id="userSearch"
+            class="form-control mb-2"
+            placeholder="Type a name…">
+      <ul id="searchResults" class="list-group slim"></ul>
+    </section>
+
+    <section class="mb-4 section-card">
+      <h3 class="fs-4">
+        Friend Requests
+        <span class="badge bg-secondary badge-count" id="requestCount">0</span>
+        <button class="btn btn-link p-0 ms-1" data-bs-toggle="collapse" data-bs-target="#reqCollapse">
+          show / hide
+        </button>
+      </h3>
+      <div id="reqCollapse" class="collapse show">
+        <div id="friendRequestsBody" class="mt-2"></div>
+      </div>
     </section>
   </main>
 
@@ -118,8 +145,28 @@
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
   ></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/update-profile.js"></script>
+  <script src="scripts/friends-list.js"></script>  
+  <script src="scripts/user-search.js"></script>
+  <script src="scripts/friend-requests.js"></script>
+  <script src="scripts/friends-modal.js"></script>
   <script>
     getFriendsList();
   </script>
+  <style>
+    .friend-pic-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;   
+    }
+    .friend-avatar-xs { 
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      object-fit:cover; 
+    }
+  </style>
 </body>
 </html>

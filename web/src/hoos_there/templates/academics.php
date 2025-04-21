@@ -47,13 +47,16 @@
                                   <input name="course_name" class="form-control" value="<?=htmlspecialchars($record["course_name"] ?? "")?>">
                                 </div>
                                 <div class="col-auto">
-                                  <input name="teammate_name" class="form-control" value="<?=htmlspecialchars($record["teammate_name"] ?? "")?>" placeholder="Teammate">
+
                                 </div>
                                 <div class="col-auto">
                                   <input name="project_title" class="form-control" value="<?=htmlspecialchars($record["project_title"] ?? "")?>" placeholder="Project Title">
                                 </div>
-                                <div class="col-auto">
-                                  <input name="karma" class="form-control" type="number" min="1" max="10" value="<?=htmlspecialchars($record["karma"])?>">
+                                <div class="col-auto d-flex align-items-center">
+                                  <span class="badge bg-info-subtle text-dark">
+                                        <?= number_format($record["karma_avg"],3) ?> / 10
+                                  </span>
+                                  <small class="text-muted ms-1">(<?= $record["karma_votes"] ?>)</small>
                                 </div>
                                 <div class="col-auto">
                                   <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
@@ -106,18 +109,17 @@
         </div>
       </div>
       <div class="row mt-2">
-        <div class="col-md-4">
-          <label for="teammate_name">Teammate (optional)</label>
-          <input type="text" name="teammate_name" class="form-control">
+        <div class="col-md-4 position-relative teammate-search-parent">
+          <label class="form-label">Teammates (optional)</label>
+          <input type="text" id="newTeammateInput" class="form-control" placeholder="Lookup user…">
+          <div id="newTeammateTags" class="mt-1"></div>
+          <input type="hidden" name="teammate_ids" id="newTeammateIds" value="">
         </div>
-        <div class="col-md-4">
-          <label for="project_title">Project Title (optional)</label>
-          <input type="text" name="project_title" class="form-control">
-        </div>
-        <div class="col-md-4">
-          <label for="karma">Karma (1-10)</label>
-          <input type="number" name="karma" class="form-control" min="1" max="10">
-        </div>
+      </div>
+      <div class="col-md-4">
+        <label for="project_title">Project Title (optional)</label>
+        <input type="text" name="project_title" class="form-control">
+      </div>
       </div>
       <button type="submit" class="btn btn-primary mt-3">Save Record</button>
     </form>
@@ -213,5 +215,12 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="scripts/teammate-picker.js"></script>
+  <script src="scripts/add-record-picker.js"></script>
+
+  <style>
+    .friend-avatar-xs{width:32px;height:32px;border-radius:50%;object-fit:cover}
+    .friend-pic-xxs { width:24px; height:24px; border-radius:50%; object-fit:cover; }
+  </style>
 </body>
 </html>
