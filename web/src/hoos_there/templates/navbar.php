@@ -24,8 +24,15 @@
           <li class="nav-item">
             <a class="nav-link" href="?command=social">Social & Professional Life</a>
           </li>
+          <?php
+            if ($this->isLoggedIn()) {
+              $name = $this->getUserInfo()["name"];
+            } else {
+              $name = "Profile";
+            }
+          ?>
           <li class="nav-item">
-            <a class="nav-link" href="?command=profile">Profile</a>
+            <a class="nav-link" href="?command=profile"><?=$name?></a>
           </li>
         </ul>
       </div>
