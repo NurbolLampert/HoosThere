@@ -35,13 +35,6 @@ async function updateSocialLinks() {
   );
 }
 
-document.getElementById("social-links-form")
-  ?.addEventListener("submit", e => {
-    e.preventDefault();
-    updateSocialLinks();
-  });
-
-
 /** PROFESSIONAL EXPERIENCES **/
 
 async function addExperience() {
@@ -75,18 +68,6 @@ async function updateExperience(id) {
     (json) => createAlert(json.message || "Failed to update experience.", "danger", "social-alerts")
   );
 }
-
-document.getElementById("add-exp-form")
-  ?.addEventListener("submit", e => {
-    e.preventDefault();
-    addExperience();
-  });
-
-document.querySelectorAll(".update-exp-btn")
-  .forEach(btn => btn.addEventListener("click", () => {
-    updateExperience(btn.dataset.id);
-  }));
-
 
 /** EDUCATION **/
 
@@ -126,18 +107,6 @@ async function updateEducation(id) {
   );
 }
 
-document.getElementById("add-edu-form")
-  ?.addEventListener("submit", e => {
-    e.preventDefault();
-    addEducation();
-  });
-
-document.querySelectorAll(".update-edu-btn")
-  .forEach(btn => btn.addEventListener("click", () => {
-    updateEducation(btn.dataset.id);
-  }));
-
-
 /** CLUBS & ORGS **/
 
 async function addClub() {
@@ -176,17 +145,6 @@ async function updateClub(id) {
   );
 }
 
-document.getElementById("add-club-form")
-  ?.addEventListener("submit", e => {
-    e.preventDefault();
-    addClub();
-  });
-
-document.querySelectorAll(".update-club-btn")
-  .forEach(btn => btn.addEventListener("click", () => {
-    updateClub(btn.dataset.id);
-  }));
-
 
 /** VOLUNTEERING **/
 
@@ -221,14 +179,3 @@ async function updateVolunteer(id) {
     (json) => createAlert(json.message || "Failed to update volunteer experience.", "danger", "social-alerts")
   );
 }
-
-document.getElementById("add-vol-form")
-  ?.addEventListener("submit", e => {
-    e.preventDefault();
-    addVolunteer();
-  });
-
-document.querySelectorAll(".update-vol-btn")
-  .forEach(btn => btn.addEventListener("click", () => {
-    updateVolunteer(btn.dataset.id);
-  }));
