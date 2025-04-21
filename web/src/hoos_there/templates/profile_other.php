@@ -105,12 +105,12 @@
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
   ></script>
-  <script>
-    getMutualFriendsList();
-  </script>
   <script src="scripts/main.js"></script>
   <script src="scripts/mutual-friends-list.js"></script> 
   <script src="scripts/karma-rate.js"></script>
+  <script>
+    getMutualFriendsList();
+  </script>
 
 </body>
 </html>
