@@ -39,7 +39,7 @@
           <h2 class="h4 mb-0">Social Media</h2>
         </div>
         <div class="card-body">
-          <form>
+          <form id="update-socials-form">
             <div class="row g-3">
               <div class="col-md-4">
                 <label for="instagram" class="form-label">Instagram</label>
@@ -58,7 +58,7 @@
               </div>
             </div>
             <div class="mt-3">
-              <button class="btn btn-primary" type="submit" onclick="updateSocialLinks(); return false">Update Links</button>
+              <button class="btn btn-primary" type="submit">Update Links</button>
             </div>
           </form>
         </div>
@@ -304,6 +304,17 @@
   <footer class="text-center py-3">
     <p>&copy; 2025 Hoo’s There Project</p>
   </footer>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
+    integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"
+  ></script>
+  <script>
+    $('form#update-socials-form').on('submit', function () {
+       updateSocialLinks();
+       return false;
+    });
+  </script>
 </body>
 </html>

@@ -78,7 +78,7 @@
 
     <!-- Button to toggle Add Record form -->
     <div class="pt-3">
-        <button class="btn btn-success mb-3" onclick="document.getElementById('add-record-form').classList.toggle('d-none')">+ Add New Record</button>
+        <button class="btn btn-success mb-3" id="add-record">+ Add New Record</button>
     </div>
 
 
@@ -217,6 +217,15 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="scripts/teammate-picker.js"></script>
   <script src="scripts/add-record-picker.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
+    integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"
+  ></script>
+  <script>
+    $('button#add-record').on('click', function () {
+      $('form#add-record-form').toggleClass('d-none')
+    });
+  </script>
 
   <style>
     .friend-avatar-xs{width:32px;height:32px;border-radius:50%;object-fit:cover}
