@@ -76,9 +76,17 @@ class HoosThereController {
                 $this->checkLoggedInOrExit();
                 $this->addAcademicRecord();
                 break;
+            case "delete_record":
+                $this->checkLoggedInOrExit();
+                $this->deleteAcademicRecord();
+                break;
             case "update_project":
                 $this->checkLoggedInOrExit();
                 $this->updateProject();
+                break;
+            case "delete_project":
+                $this->checkLoggedInOrExit();
+                $this->deleteProject();
                 break;
             case "add_project":
                 $this->checkLoggedInOrExit();
@@ -486,16 +494,32 @@ class HoosThereController {
         $karma = 0;
     
         $service = new AcademicsService($this->db);
-        $recordId = $service->insertRecord($user_id, $year, $term, $code, $name, $teammate, $project, $karma);
+        $recordId = $service->addRecord($user_id, $year, $term, $code, $name, $teammate, $project, $karma);
     
         if (!empty($_POST["teammate_ids"])) {
-            $idsArr = array_filter(array_map('intval',
+            $teammateIds = array_filter(array_map('intval',
                         explode(',', $_POST["teammate_ids"])));
-            $service->addTeammates($recordId, $idsArr);
+            $service->addTeammates($recordId, $teammateIds);
         }
     
-
         $this->createAlert("New academic record added!", "success");
+        $this->redirectPage("academics");
+    }
+
+    private function deleteAcademicRecord() {
+        $id = $this->input["id"] ?? null;
+        $confirm = $_POST["confirm"] ?? null;
+
+        if (!$id || $confirm !== '1') {
+            $this->createAlert("Missing record ID or confirmation.", "danger");
+            $this->redirectPage("academics");
+            return;
+        }
+    
+        $service = new AcademicsService($this->db);
+        $service->deleteRecord($id);
+    
+        $this->createAlert("Academic record deleted!", "success");
         $this->redirectPage("academics");
     }
 
@@ -520,15 +544,32 @@ class HoosThereController {
     }
     
     private function addProject() {
-        if (!isset($_POST["project_title"]) || !isset($_POST["description"])) {
-            $this->createAlert("Missing project title or description", "danger");
+        if (!isset($_POST["project_title"]) || !isset($_POST["project_description"])) {
+            $this->createAlert("Missing project title or description.", "danger");
             $this->redirectPage("academics");
             return;
         }
     
         $service = new AcademicsService($this->db);
-        $service->addProject($_SESSION["user_id"], $_POST["project_title"], $_POST["description"]);
+        $service->addProject($_SESSION["user_id"], $_POST["project_title"], $_POST["project_description"]);
         $this->createAlert("Project added!", "success");
+        $this->redirectPage("academics");
+    }
+
+    private function deleteProject() {
+        $id = $this->input["id"] ?? null;
+        $confirm = $_POST["confirm"] ?? null;
+
+        if (!$id || $confirm !== '1') {
+            $this->createAlert("Missing project ID or confirmation.", "danger");
+            $this->redirectPage("academics");
+            return;
+        }
+    
+        $service = new AcademicsService($this->db);
+        $service->deleteProject($id);
+    
+        $this->createAlert("Project deleted!", "success");
         $this->redirectPage("academics");
     }
     

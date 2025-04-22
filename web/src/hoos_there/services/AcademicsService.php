@@ -44,7 +44,7 @@ class AcademicsService {
         );
     }
 
-    public function insertRecord($user_id, $year, $term, $code, $name, $teammate, $project, $karma) {
+    public function addRecord($user_id, $year, $term, $code, $name, $teammate, $project, $karma) {
         $this->db->query(
             "INSERT INTO academic_records (user_id, year, term, course_code, course_name, teammate_name, project_title, karma)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
@@ -52,6 +52,9 @@ class AcademicsService {
         );
     }
 
+    public function deleteRecord($id) {
+        $this->db->query("DELETE FROM academic_records WHERE id = $1", $id);
+    }
 
     public function updateProject($user_id, $project_id, $title, $desc) {
         $this->db->query(
@@ -68,13 +71,17 @@ class AcademicsService {
         );
     }
 
+    public function deleteProject($id) {
+        $this->db->query("DELETE FROM academic_records WHERE id = $1", $id);
+    }
+
     public function updateGoal($user_id, $goal_text) {
         $this->db->query("DELETE FROM future_goals WHERE user_id = $1", $user_id); // allow only one for now
         $this->db->query("INSERT INTO future_goals (user_id, goal_description) VALUES ($1, $2)", $user_id, $goal_text);
     }
 
-    public function addTeammates($recordId, array $userIds) {
-        foreach ($userIds as $uid) {
+    public function addTeammates($recordId, array $teammateIds) {
+        foreach ($teammateIds as $uid) {
             $this->db->query(
             "INSERT INTO academic_teammates (record_id, teammate_id)
             VALUES ($1,$2) ON CONFLICT DO NOTHING",

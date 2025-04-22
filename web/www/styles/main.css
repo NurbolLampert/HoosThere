@@ -115,7 +115,7 @@ h1, h2, h3 {
   color: #fff;
 }
 
-.btn-danger {
+.btn-del {
   color: #fff;
   border: none;
   padding: 0.4rem 0.6rem;
@@ -125,7 +125,7 @@ h1, h2, h3 {
   border-radius: 4px;
 }
 
-.btn-danger:hover {
+.btn-del:hover {
   background-color: #740000;
 }
 

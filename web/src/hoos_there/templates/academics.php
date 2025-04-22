@@ -7,6 +7,10 @@
   <title>Academics - Hoo’s There</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="styles/main.css">
+  <style>
+    .friend-avatar-xs{width:32px;height:32px;border-radius:50%;object-fit:cover}
+    .friend-pic-xxs { width:24px; height:24px; border-radius:50%; object-fit:cover; }
+  </style>
 </head>
 <body>
   <?php $this->showTemplate("navbar.php"); ?>
@@ -17,6 +21,7 @@
     <!-- Outer Accordion by Year -->
     <div class="accordion" id="yearAccordion">
       <?php foreach ($academic_data["grouped"] as $year => $terms): ?>
+        <!-- Year Accordion -->
         <div class="accordion-item">
           <h2 class="accordion-header" id="headingYear<?=$year?>">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseYear<?=$year?>">
@@ -27,6 +32,7 @@
             <div class="accordion-body">
               <div class="accordion" id="accordionYear<?=$year?>Terms">
                 <?php foreach ($terms as $term => $records): ?>
+                  <!-- Term Accordion -->
                   <div class="accordion-item">
                     <h3 class="accordion-header" id="heading<?=$year?><?=$term?>">
                       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?=$year?><?=$term?>">
@@ -35,33 +41,44 @@
                     </h3>
                     <div id="collapse<?=$year?><?=$term?>" class="accordion-collapse collapse" data-bs-parent="#accordionYear<?=$year?>Terms">
                       <div class="accordion-body">
-                        <ul>
+                        <ul style="list-style-type: none">
                           <?php foreach ($records as $record): ?>
+                            <!-- Academic Record Item -->
                             <li>
-                              <form class="row g-2 align-items-center mb-2" method="post" action="?command=update_record">
-                                <input type="hidden" name="record_id" value="<?=htmlspecialchars($record["id"])?>">
+                              <!-- Update Form -->
+                              <div class="row g-2 mb-2 align-items-center">
                                 <div class="col-auto">
-                                  <input name="course_code" class="form-control" value="<?=htmlspecialchars($record["course_code"] ?? "")?>">
+                                  <form class="row g-2" method="post" action="?command=update_record">
+                                    <input type="hidden" name="record_id" value="<?=htmlspecialchars($record["id"])?>">
+                                    <div class="col-auto">
+                                      <input name="course_code" class="form-control" value="<?=htmlspecialchars($record["course_code"] ?? "")?>">
+                                    </div>
+                                    <div class="col-auto">
+                                      <input name="course_name" class="form-control" value="<?=htmlspecialchars($record["course_name"] ?? "")?>">
+                                    </div>
+                                    <div class="col-auto">
+                                      <input name="project_title" class="form-control" value="<?=htmlspecialchars($record["project_title"] ?? "")?>" placeholder="Project Title">
+                                    </div>
+                                    <div class="col-auto d-flex align-items-center">
+                                      <span class="badge bg-info-subtle text-dark">
+                                            <?= number_format($record["karma_avg"],3) ?> / 10
+                                      </span>
+                                      <small class="text-muted ms-1">(<?= $record["karma_votes"] ?>)</small>
+                                    </div>
+                                    <div class="col-auto">
+                                      <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+                                    </div>
+                                  </form>
                                 </div>
-                                <div class="col-auto">
-                                  <input name="course_name" class="form-control" value="<?=htmlspecialchars($record["course_name"] ?? "")?>">
-                                </div>
-                                <div class="col-auto">
 
-                                </div>
+                                <!-- Delete Form -->
                                 <div class="col-auto">
-                                  <input name="project_title" class="form-control" value="<?=htmlspecialchars($record["project_title"] ?? "")?>" placeholder="Project Title">
+                                  <form method="post" action="?command=delete_record&id=<?=$record['id']?>">
+                                    <input type="hidden" name="confirm" value="1">
+                                    <button type="submit" class="mb-2 btn btn-outline-danger btn-sm">Delete</button>
+                                  </form>
                                 </div>
-                                <div class="col-auto d-flex align-items-center">
-                                  <span class="badge bg-info-subtle text-dark">
-                                        <?= number_format($record["karma_avg"],3) ?> / 10
-                                  </span>
-                                  <small class="text-muted ms-1">(<?= $record["karma_votes"] ?>)</small>
-                                </div>
-                                <div class="col-auto">
-                                  <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
-                                </div>
-                              </form>
+                              </div>
                             </li>
                           <?php endforeach; ?>
                         </ul>
@@ -75,10 +92,11 @@
         </div>
       <?php endforeach; ?>
     </div>
+    <!-- Accordions End -->
 
     <!-- Button to toggle Add Record form -->
     <div class="pt-3">
-        <button class="btn btn-success mb-3" id="add-record">+ Add New Record</button>
+        <button class="btn btn-outline-success mb-3" id="add-record">+ Add New Record</button>
     </div>
 
 
@@ -99,29 +117,31 @@
             <option value="Summer">Summer</option>
           </select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
           <label for="course_code">Course Code</label>
-          <input type="text" name="course_code" class="form-control" required>
+          <input type="text" name="course_code" id="course_code" class="form-control" required>
         </div>
-        <div class="col-md-5">
+        <div class="col-md-3">
           <label for="course_name">Course Name</label>
-          <input type="text" name="course_name" class="form-control" required>
+          <input type="text" name="course_name" id="course_name" class="form-control" required>
+        </div>
+        <div class="col-md-3">
+          <label for="project_title">Project Title (optional)</label>
+          <input type="text" name="project_title" id="project_title" class="form-control">
         </div>
       </div>
+      
+      <!-- Pick Teammates -->
       <div class="row mt-2">
-        <div class="col-md-4 position-relative teammate-search-parent">
+        <div class="col-md-6 position-relative teammate-search-parent">
           <label class="form-label">Teammates (optional)</label>
           <input type="text" id="newTeammateInput" class="form-control" placeholder="Lookup user…">
+          <!-- Show selected teammates -->
           <div id="newTeammateTags" class="mt-1"></div>
           <input type="hidden" name="teammate_ids" id="newTeammateIds" value="">
         </div>
       </div>
-      <div class="col-md-4">
-        <label for="project_title">Project Title (optional)</label>
-        <input type="text" name="project_title" class="form-control">
-      </div>
-      </div>
-      <button type="submit" class="btn btn-primary mt-3">Save Record</button>
+      <button type="submit" class="btn btn-success btn-sm mt-3">Add Record</button>
     </form>
 
     <hr>
@@ -157,6 +177,12 @@
                 </div>
                 <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
             </form>
+
+            <!-- Delete Form -->
+            <form method="post" action="?command=delete_project&id=<?=$project['id']?>">
+              <input type="hidden" name="confirm" value="1">
+              <button type="submit" class="mt-2 btn btn-danger btn-sm">Delete Project</button>
+            </form>
             </div>
         </div>
         </div>
@@ -185,29 +211,23 @@
     </div>
     </section>
 
-
-
     <hr>
 
     <!-- Future Goals Section -->
     <section class="mt-4">
-        <h2 class="fs-3">Future Goals</h2>
+      <h2 class="fs-3">Future Goals</h2>
 
-        <?php if (!empty($academic_data["goals"])): ?>
-            <p><?=htmlspecialchars($academic_data["goals"][0]["goal_description"] ?? '')?></p>
-        <?php else: ?>
-            <p>No goals set.</p>
-        <?php endif; ?>
+      <?php $goals = htmlspecialchars($academic_data["goals"][0]["goal_description"] ?? '');?>
 
-        <form method="post" action="?command=update_goals" class="mt-3">
-            <div class="mb-3">
-            <textarea name="goal_description" rows="3" class="form-control" placeholder="Describe your future goals"><?=htmlspecialchars($academic_data["goals"][0]["goal_description"] ?? '')?></textarea>
-            </div>
-            <button class="btn btn-outline-primary" type="submit">Save Goals</button>
-        </form>
-        </section>
-
-
+      <form method="post" action="?command=update_goals" class="mt-3">
+          <div class="mb-3">
+          <textarea
+            name="goal_description" rows="3" class="form-control"
+            placeholder="Describe your future goals here."><?=$goals?></textarea>
+          </div>
+          <button class="btn btn-outline-primary" type="submit">Save Goals</button>
+      </form>
+    </section>
   </main>
 
   <footer class="text-center py-3">
@@ -222,14 +242,11 @@
     crossorigin="anonymous" referrerpolicy="no-referrer"
   ></script>
   <script>
-    $('button#add-record').on('click', function () {
-      $('form#add-record-form').toggleClass('d-none')
+    $(document).ready(function() {
+      $('button#add-record').on('click', function () {
+        $('form#add-record-form').toggleClass('d-none')
+      });
     });
   </script>
-
-  <style>
-    .friend-avatar-xs{width:32px;height:32px;border-radius:50%;object-fit:cover}
-    .friend-pic-xxs { width:24px; height:24px; border-radius:50%; object-fit:cover; }
-  </style>
 </body>
 </html>
