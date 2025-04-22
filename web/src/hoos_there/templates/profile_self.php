@@ -82,12 +82,20 @@
       <h2 class="fs-3 d-inline me-2">
           Friends: <span id="friendCount">0</span>
       </h2>
+
       <button class="btn btn-sm btn-outline-primary"
               id="openFriendsBtn"
               data-bs-toggle="modal"
               data-bs-target="#friendsModal">
           View Friends
       </button>
+
+      <h3 class="fs-5 mt-3">Look up Hoos</h3>
+      <input type="search"
+            id="userSearch"
+            class="form-control mb-2"
+            placeholder="Type a name…">
+      <ul id="searchResults" class="list-group slim"></ul>
     </section>
 
     <div class="modal fade" id="friendsModal" tabindex="-1" aria-hidden="true">
@@ -115,16 +123,7 @@
       </div>
     </div>
 
-    <section class="mb-4 section-card">
-      <h3 class="fs-4">Look up Hoos</h3>
-      <input type="search"
-            id="userSearch"
-            class="form-control mb-2"
-            placeholder="Type a name…">
-      <ul id="searchResults" class="list-group slim"></ul>
-    </section>
-
-    <section class="mb-4 section-card">
+    <section class="mt-4 section-card">
       <h3 class="fs-4">
         Friend Requests
         <span class="badge bg-secondary badge-count" id="requestCount">0</span>

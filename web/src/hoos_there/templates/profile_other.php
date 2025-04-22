@@ -47,7 +47,8 @@
       </div>
     </section>
 
-    <section class="mt-4">
+    <!-- Academic history -->
+    <section class="mt-4 section-card">
       <h2 class="fs-3">Academic History</h2>
 
       <div class="accordion" id="yearAccordion">
@@ -92,7 +93,7 @@
     </section>
    
     <!-- Mutual Friends Section -->
-    <section>
+    <section class="mt-4 section-card">
       <h2 class="fs-3" id="mutual-friends-list-text">Mutual Friends (0)</h2>
       <div class="row" id="mutual-friends-list-row"></div>
     </section>

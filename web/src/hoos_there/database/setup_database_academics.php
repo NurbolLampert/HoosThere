@@ -70,16 +70,94 @@ $res = pg_query_params($dbHandle, "SELECT id FROM hoos_there_users WHERE email =
 $demoUserId = pg_fetch_result($res, 0, 'id');
 
 // Records
-$records = [
+$demoRecords = [
+    [4, 'Fall', 'TEST 1230', 'Test Course 1', 'Test Project 1', '', 0],
+    [4, 'Spring', 'TEST 1240', 'Test Course 2', 'Test Project 2', '', 0]
+];
+foreach ($demoRecords as $demoRecord) {
+    for ($i = 1; $i <= 3; $i++) {
+        pg_query_params(
+            $dbHandle, "INSERT INTO academic_records
+            (user_id, year, term, course_code, course_name, project_title, teammate_name, karma)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
+            array_merge([$i], $demoRecord)
+        );
+    }
+}
+
+// Teammates
+$teammates = [
+    [
+        "record_ids" => [1, 4],
+        "teammate_ids" => [2, 3]
+    ],
+    [
+        "record_ids" => [2, 5],
+        "teammate_ids" => [1, 3]
+    ],
+    [
+        "record_ids" => [3, 6],
+        "teammate_ids" => [1, 2]
+    ]
+];
+
+foreach ($teammates as $t) {
+    foreach ($t["record_ids"] as $record_id) {
+        foreach ($t["teammate_ids"] as $teammate_id) {
+            pg_query_params(
+                $dbHandle, "INSERT INTO academic_teammates (record_id, teammate_id)
+                VALUES ($1, $2);",
+                [$record_id, $teammate_id]
+            );
+        }
+    }
+}
+
+// Karma
+$karma_entries = [
+    [
+        "record_id" => 1,
+        "rater_id" => 2,
+        "points" => 10
+    ],
+    [
+        "record_id" => 1,
+        "rater_id" => 3,
+        "points" => 7
+    ],
+    [
+        "record_id" => 4,
+        "rater_id" => 2,
+        "points" => 8
+    ],
+    [
+        "record_id" => 4,
+        "rater_id" => 3,
+        "points" => 4
+    ]
+];
+foreach ($karma_entries as $k) {
+    pg_query_params(
+        $dbHandle, "INSERT INTO academic_karma (record_id, rater_id, points)
+        VALUES ($1, $2, $3);",
+        [$k["record_id"], $k["rater_id"], $k["points"]]
+    );
+}
+
+// More Records
+
+$moreRecords = [
     [1, 'Fall', 'ECON 2010', 'Microeconomics', 'Aaron', 'ECON Group Project', 8],
     [1, 'Fall', 'ENWR 1505', 'Writing & Critical Inquiry', '', '', 0],
     [2, 'J-Term', 'STAT 1100', 'Statistics in Everyday Life', '', '', 0],
     [3, 'Spring', 'ECON 2020', 'Macroeconomics', 'Caroline', 'Macroeconomics Presentation', 9],
-    [4, 'Spring', 'MATH 1210', 'Applied Calculus I', '', '', 0]
+    [4, 'Spring', 'MATH 1210', 'Applied Calculus I', '', '', 0],
 ];
 
-foreach ($records as $r) {
-    pg_query_params($dbHandle, "INSERT INTO academic_records (user_id, year, term, course_code, course_name, teammate_name, project_title, karma)
+foreach ($moreRecords as $r) {
+    pg_query_params(
+        $dbHandle, "INSERT INTO academic_records
+        (user_id, year, term, course_code, course_name, teammate_name, project_title, karma)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
         array_merge([$demoUserId], $r)
     );
