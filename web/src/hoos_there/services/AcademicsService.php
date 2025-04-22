@@ -7,6 +7,8 @@ class AcademicsService {
         $this->db = $db;
     }
 
+    // Records
+
     public function getRecords($user_id) {
         $result = $this->db->query("SELECT ar.*, 
                     COALESCE(k.avg,0) AS karma_avg, 
@@ -59,6 +61,8 @@ class AcademicsService {
         $this->db->query("DELETE FROM academic_records WHERE id = $1", $id);
     }
 
+    // Projects
+
     public function updateProject($user_id, $project_id, $title, $desc) {
         $this->db->query(
             "UPDATE personal_projects
@@ -78,10 +82,14 @@ class AcademicsService {
         $this->db->query("DELETE FROM academic_records WHERE id = $1", $id);
     }
 
+    // Goals
+
     public function updateGoal($user_id, $goal_text) {
         $this->db->query("DELETE FROM future_goals WHERE user_id = $1", $user_id); // allow only one for now
         $this->db->query("INSERT INTO future_goals (user_id, goal_description) VALUES ($1, $2)", $user_id, $goal_text);
     }
+
+    // Teammates
 
     public function addTeammates($recordId, array $teammateIds) {
         foreach ($teammateIds as $uid) {
@@ -121,10 +129,9 @@ class AcademicsService {
     }
 
     // Karma
+
     public function saveKarma($recordId, $raterId, $points) {
         $this->db->query(
-        VALUES ($1,$2,$3)
-        ON CONFLICT (record_id, rater_id)
             "INSERT INTO academic_karma (record_id, rater_id, points)
             VALUES ($1,$2,$3)
             ON CONFLICT (record_id, rater_id)

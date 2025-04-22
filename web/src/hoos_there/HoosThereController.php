@@ -2,6 +2,7 @@
 require_once("services/UsersService.php");
 require_once("services/AcademicsService.php");
 require_once("services/SocialProfessionalService.php");
+
 /**
  * Front controller for HoosThere app.
  */
@@ -276,11 +277,11 @@ class HoosThereController {
         
         // Create new user
         $name = $_POST["name"];
-        $user = $service->createUser($name, $year, $email, $password);
+        $user_id = $service->createUser($name, $year, $email, $password);
         $this->createAlert("Created new user $name with email $email.", "success");
 
         // Redirect to user profile
-        $_SESSION["user_id"] = $user["id"];
+        $_SESSION["user_id"] = $user_id;
         $this->redirectPage("profile&id=" . $_SESSION["user_id"]);
     }
 
@@ -454,6 +455,8 @@ class HoosThereController {
         $this->showJSONResponse($data);
     }
 
+    // Academics
+
     private function showAcademics() {
         $this->checkLoggedInOrExit();
         $service = new AcademicsService($this->db);
@@ -523,6 +526,7 @@ class HoosThereController {
         $this->redirectPage("academics");
     }
 
+    // Projects
 
     private function updateProject() {
         $user_id = $_SESSION["user_id"];
@@ -572,6 +576,8 @@ class HoosThereController {
         $this->createAlert("Project deleted!", "success");
         $this->redirectPage("academics");
     }
+
+    // Goals
     
     private function updateGoals() {
         if (!isset($_POST["goal_description"])) {
@@ -585,6 +591,8 @@ class HoosThereController {
         $this->createAlert("Goals updated!", "success");
         $this->redirectPage("academics");
     }
+
+    // Socials
     
     private function showSocial() {
         $service = new SocialProfessionalService($this->db);
@@ -612,6 +620,8 @@ class HoosThereController {
         ];
         $this->showJSONResponse($data);
     }
+
+    // Experiences
     
     private function addExperience() {
         $service = new SocialProfessionalService($this->db);
@@ -645,6 +655,8 @@ class HoosThereController {
         
         $this->redirectPage("social");
     }
+
+    // Education
 
     private function addEducation() {
         $service = new SocialProfessionalService($this->db);
@@ -681,6 +693,8 @@ class HoosThereController {
 
         $this->redirectPage("social");
     }
+
+    // Clubs
     
     private function addClub() {
         $service = new SocialProfessionalService($this->db);
@@ -717,6 +731,8 @@ class HoosThereController {
 
         $this->redirectPage("social");
     }
+
+    // Volunteering
     
     private function addVolunteer() {
         $service = new SocialProfessionalService($this->db);
@@ -750,6 +766,8 @@ class HoosThereController {
         
         $this->redirectPage("social");
     }
+
+    // Friends
 
     private function getFriends() {
         $user_id = $_SESSION["user_id"];

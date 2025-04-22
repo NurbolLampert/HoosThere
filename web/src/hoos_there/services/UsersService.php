@@ -7,6 +7,8 @@ class UsersService {
         $this->db = $db;
     }
 
+    // Users
+
     /**
      * Look up a user by ID.
      */
@@ -46,17 +48,18 @@ class UsersService {
     }
 
     /**
-     * Create a new user account and return it.
+     * Create a new user account and return its id.
      */
     public function createUser($name, $year, $email, $password) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $this->db->query(
+        $res = $this->db->query(
             "INSERT INTO hoos_there_users (name, year, email, password)
-            VALUES ($1, $2, $3, $4)",
+            VALUES ($1, $2, $3, $4)
+            RETURNING id",
             $name, $year, $email, $hashed_password
         );
-        // Fetch new user (will exist)
-        return $this->getUserByEmail($email);
+        // Fetch new user id
+        return $res[0]["id"];
     }
 
     /**
@@ -85,6 +88,24 @@ class UsersService {
         $users = $this->db->query("SELECT * FROM hoos_there_users ORDER BY id DESC LIMIT $count");
         return $users;
     }
+
+    public function searchUsers($userId, $term, $limit = 15) {
+        $sql = "WITH friend_ids AS (
+                SELECT user1_id AS id FROM hoos_there_friends WHERE user2_id = $1
+                UNION
+                SELECT user2_id AS id FROM hoos_there_friends WHERE user1_id = $1
+            )
+            SELECT u.id, u.name,
+                (u.id = ANY(SELECT id FROM friend_ids)) AS is_friend
+            FROM hoos_there_users u
+            WHERE u.name ILIKE '%' || $2 || '%'
+            AND u.id <> $1
+            ORDER BY u.name
+            LIMIT $3";
+        return $this->db->query($sql, $userId, $term, $limit);
+    }
+
+    // Friends
 
     /**
      * Get the logged-in user's friends list.
@@ -159,21 +180,7 @@ class UsersService {
         return $friends;
     }
 
-    public function searchUsers($userId, $term, $limit = 15) {
-        $sql = "WITH friend_ids AS (
-                SELECT user1_id AS id FROM hoos_there_friends WHERE user2_id = $1
-                UNION
-                SELECT user2_id AS id FROM hoos_there_friends WHERE user1_id = $1
-            )
-            SELECT u.id, u.name,
-                (u.id = ANY(SELECT id FROM friend_ids)) AS is_friend
-            FROM hoos_there_users u
-            WHERE u.name ILIKE '%' || $2 || '%'
-            AND u.id <> $1
-            ORDER BY u.name
-            LIMIT $3";
-        return $this->db->query($sql, $userId, $term, $limit);
-    }
+    // Requests
     
     public function createFriendRequest($from, $to) {
         $this->db->query(

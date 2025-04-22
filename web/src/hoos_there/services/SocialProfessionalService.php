@@ -22,6 +22,8 @@ class SocialProfessionalService {
         ];
     }
 
+    // Links
+
     public function updateSocialLinks($user_id, $insta, $linkedin, $facebook) {
         $existing = $this->db->query("SELECT * FROM social_links WHERE user_id = $1;", $user_id);
         if (empty($existing)) {
@@ -36,6 +38,8 @@ class SocialProfessionalService {
             );
         }
     }
+
+    // Experiences
 
     public function addExperience($user_id, $role, $description) {
         $this->db->query(
@@ -54,6 +58,8 @@ class SocialProfessionalService {
         $this->db->query("DELETE FROM professional_experiences WHERE id = $1;", $id);
     }
 
+    // Education
+
     public function addEducation($user_id, $degree, $institution, $expected_graduation) {
         $this->db->query("INSERT INTO education_records (user_id, degree, institution, expected_graduation) VALUES ($1, $2, $3, $4);",
             $user_id, $degree, $institution, $expected_graduation
@@ -70,6 +76,8 @@ class SocialProfessionalService {
     public function removeEducation($id) {
         $this->db->query("DELETE FROM education_records WHERE id = $1;", $id);
     }
+
+    // Clubs
 
     public function addClub($user_id, $name, $role, $year) {
         $this->db->query(
@@ -88,6 +96,8 @@ class SocialProfessionalService {
     public function removeClub($id) {
         $this->db->query("DELETE FROM student_organizations WHERE id = $1;", $id);
     }
+
+    // Volunteering
 
     public function addVolunteer($user_id, $organization, $description) {
         $this->db->query(
