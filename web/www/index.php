@@ -28,7 +28,7 @@ spl_autoload_register(function ($classname) use ($include_path) {
 // Run the database script
 $reset_db = false;
 if ($reset_db) {
-    include($include_path . "/setup_database.php");
+    include($include_path . "/database/setup_database.php");
     exit();
 }
 

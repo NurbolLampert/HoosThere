@@ -10,8 +10,8 @@ if ($dbHandle) {
     die("An error occurred connecting to the database");
 }
 
-include($include_path . "/setup_database_users.php");
-include($include_path . "/setup_database_socials.php");
-include($include_path . "/setup_database_academics.php");
+include($include_path . "/database/setup_database_users.php");
+include($include_path . "/database/setup_database_socials.php");
+include($include_path . "/database/setup_database_academics.php");
 
 echo "Success setting up database<br>\n";
