@@ -45,11 +45,14 @@ class AcademicsService {
     }
 
     public function addRecord($user_id, $year, $term, $code, $name, $teammate, $project, $karma) {
-        $this->db->query(
-            "INSERT INTO academic_records (user_id, year, term, course_code, course_name, teammate_name, project_title, karma)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+        $res[0] = $this->db->query(
+            "INSERT INTO academic_records
+            (user_id, year, term, course_code, course_name, teammate_name, project_title, karma)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING id",
             $user_id, $year, $term, $code, $name, $teammate, $project, $karma
         );
+        return $res[0][0]["id"]; // Fetch new record id
     }
 
     public function deleteRecord($id) {
@@ -83,24 +86,33 @@ class AcademicsService {
     public function addTeammates($recordId, array $teammateIds) {
         foreach ($teammateIds as $uid) {
             $this->db->query(
-            "INSERT INTO academic_teammates (record_id, teammate_id)
-            VALUES ($1,$2) ON CONFLICT DO NOTHING",
-            $recordId, $uid
+                "INSERT INTO academic_teammates (record_id, teammate_id)
+                VALUES ($1, $2) ON CONFLICT DO NOTHING",
+                $recordId, $uid
             );
         }
+        $res = $this->db->query(
+            "SELECT * FROM academic_teammates"
+        );
     }
 
     public function getTeammates($recordId){
         return $this->db->query(
-          "SELECT u.id, u.name
-             FROM academic_teammates t
-             JOIN hoos_there_users u ON u.id = t.teammate_id
+            "SELECT u.id, u.name
+            FROM academic_teammates t
+            JOIN hoos_there_users u ON u.id = t.teammate_id
             WHERE t.record_id = $1
-            ORDER BY u.name", $recordId);
+            ORDER BY u.name", $recordId
+        );
     }
     
 
     public function userIsTeammate($recordId, $userId) {
+        $res = $this->db->query(
+            "SELECT * FROM academic_teammates
+            WHERE record_id = $1 AND teammate_id = $2 LIMIT 1",
+            $recordId, $userId
+        );
         return !empty($this->db->query(
             "SELECT 1 FROM academic_teammates
             WHERE record_id = $1 AND teammate_id = $2 LIMIT 1",
@@ -108,13 +120,16 @@ class AcademicsService {
         ));
     }
 
+    // Karma
     public function saveKarma($recordId, $raterId, $points) {
         $this->db->query(
-        "INSERT INTO academic_karma (record_id, rater_id, points)
         VALUES ($1,$2,$3)
         ON CONFLICT (record_id, rater_id)
-        DO UPDATE SET points = $3",
-        $recordId, $raterId, $points
+            "INSERT INTO academic_karma (record_id, rater_id, points)
+            VALUES ($1,$2,$3)
+            ON CONFLICT (record_id, rater_id)
+            DO UPDATE SET points = $3",
+            $recordId, $raterId, $points
         );
     }
 
