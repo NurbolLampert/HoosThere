@@ -585,12 +585,23 @@ class HoosThereController {
     
     private function updateExperience() {
         $service = new SocialProfessionalService($this->db);
-        $service->updateExperience(
-            $_POST["id"],
-            $_POST["role"] ?? '',
-            $_POST["description"] ?? ''
-        );
-        $this->createAlert("Experience updated.", "success");
+        $id = $_POST["id"];
+        $role = $_POST["role"] ?? '';
+        $description = $_POST["description"] ?? '';
+
+        // Remove if all fields blank
+        if (empty($role) && empty($description)) {
+            $service->removeExperience($id);
+            $this->createAlert("Experience removed.", "success");
+        } else {
+            $service->updateExperience(
+                $_POST["id"],
+                $_POST["role"] ?? '',
+                $_POST["description"] ?? ''
+            );
+            $this->createAlert("Experience updated.", "success");
+        }
+        
         $this->redirectPage("social");
     }
 
@@ -608,13 +619,25 @@ class HoosThereController {
     
     private function updateEducation() {
         $service = new SocialProfessionalService($this->db);
-        $service->updateEducation(
-            $_POST["id"],
-            $_POST["degree"] ?? '',
-            $_POST["institution"] ?? '',
-            $_POST["expected_graduation"] ?? ''
-        );
-        $this->createAlert("Education updated.", "success");
+        $id = $_POST["id"];
+        $degree = $_POST["role"] ?? '';
+        $institution = $_POST["description"] ?? '';
+        $expected_graduation = $_POST["expected_graduation"] ?? '';
+        
+        // Remove if all fields blank
+        if (empty($degree) && empty($institution) && empty($expected_graduation)) {
+            $service->removeEducation($id);
+            $this->createAlert("Education removed.", "success");
+        } else {
+            $service->updateEducation(
+                $id,
+                $degree ?? '',
+                $instagram ?? '',
+                $expected_graduation ?? ''
+            );
+            $this->createAlert("Education updated.", "success");
+        }
+
         $this->redirectPage("social");
     }
     
@@ -632,13 +655,25 @@ class HoosThereController {
     
     private function updateClub() {
         $service = new SocialProfessionalService($this->db);
-        $service->updateClub(
-            $_POST["id"],
-            $_POST["name"] ?? '',
-            $_POST["role"] ?? '',
-            $_POST["year"] ?? ''
-        );
-        $this->createAlert("Club/Organization updated.", "success");
+        $id = $_POST["id"];
+        $name = $_POST["name"] ?? '';
+        $role = $_POST["role"] ?? '';
+        $year = $_POST["year"] ?? '';
+
+        // Remove if all fields blank
+        if (empty($name) && empty($role) && empty($year)) {
+            $service->removeClub($id);
+            $this->createAlert("Club/organization removed.", "success");
+        } else {
+            $service->updateClub(
+                $id,
+                $name ?? '',
+                $role ?? '',
+                $role ?? ''
+            );
+            $this->createAlert("Club/organization updated.", "success");
+        }
+
         $this->redirectPage("social");
     }
     
@@ -655,12 +690,23 @@ class HoosThereController {
     
     private function updateVolunteer() {
         $service = new SocialProfessionalService($this->db);
-        $service->updateVolunteer(
-            $_POST["id"],
-            $_POST["organization"] ?? '',
-            $_POST["description"] ?? ''
-        );
-        $this->createAlert("Volunteer experience updated.", "success");
+        $id = $_POST["id"];
+        $organization = $_POST["organization"] ?? '';
+        $description = $_POST["description"] ?? '';
+
+        // Remove if all fields blank
+        if (empty($organization) && empty($description)) {
+            $service->removeVolunteer($id);
+            $this->createAlert("Volunteer experience removed.", "success");
+        } else {
+            $service->updateVolunteer(
+                $id,
+                $organization ?? '',
+                $description ?? ''
+            );
+            $this->createAlert("Volunteer experience updated.", "success");
+        }
+        
         $this->redirectPage("social");
     }
 

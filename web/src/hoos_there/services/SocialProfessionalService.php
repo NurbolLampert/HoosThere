@@ -50,6 +50,10 @@ class SocialProfessionalService {
         );
     }
 
+    public function removeExperience($id) {
+        $this->db->query("DELETE FROM professional_experiences WHERE id = $1;", $id);
+    }
+
     public function addEducation($user_id, $degree, $institution, $expected_graduation) {
         $this->db->query("INSERT INTO education_records (user_id, degree, institution, expected_graduation) VALUES ($1, $2, $3, $4);",
             $user_id, $degree, $institution, $expected_graduation
@@ -61,6 +65,10 @@ class SocialProfessionalService {
             "UPDATE education_records SET degree = $1, institution = $2, expected_graduation = $3 WHERE id = $4;",
             $degree, $institution, $expected_graduation, $id
         );
+    }
+
+    public function removeEducation($id) {
+        $this->db->query("DELETE FROM education_records WHERE id = $1;", $id);
     }
 
     public function addClub($user_id, $name, $role, $year) {
@@ -77,6 +85,10 @@ class SocialProfessionalService {
         );
     }
 
+    public function removeClub($id) {
+        $this->db->query("DELETE FROM student_organizations WHERE id = $1;", $id);
+    }
+
     public function addVolunteer($user_id, $organization, $description) {
         $this->db->query(
             "INSERT INTO volunteering_experiences (user_id, organization, description) VALUES ($1, $2, $3);",
@@ -89,5 +101,9 @@ class SocialProfessionalService {
             "UPDATE volunteering_experiences SET organization = $1, description = $2 WHERE id = $3;",
             $organization, $description, $id
         );
+    }
+
+    public function removeVolunteer($id) {
+        $this->db->query("DELETE FROM volunteering_experiences WHERE id = $1;", $id);
     }
 }
