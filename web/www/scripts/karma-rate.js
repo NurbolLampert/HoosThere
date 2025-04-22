@@ -4,14 +4,14 @@ document.addEventListener("click", ev => {
   openModal(recId, ev.target);
 });
 
-function openModal(recId, anchorBtn){
+function openModal(recId, anchor){
   const modal = document.createElement("div");
   modal.className = "modal fade";
   modal.innerHTML = `
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-body text-center">
-        <label class="form-label">Give karma (0‑10)</label>
+        <label class="form-label">Give Karma (0‑10)</label>
         <input type="range" min="0" max="10" value="5" id="slider" class="form-range">
         <div id="val" class="fw-bold mb-2">5</div>
         <button class="btn btn-primary w-100" id="submitKarma">Submit</button>
