@@ -455,6 +455,18 @@ class HoosThereController {
         $this->showJSONResponse($data);
     }
 
+    private function getNewUsers() {
+        $service = new UsersService($this->db);
+        $userData = $service->getNewUsers();
+        $newUsers = [];
+        foreach ($userData as $user) {
+            $avatar = $this->getUserAvatar($user["id"]);
+            $user["avatar"] = $avatar;
+            $newUsers[] = $user;
+        }
+        return $newUsers;
+    }
+
     // Academics
 
     private function showAcademics() {

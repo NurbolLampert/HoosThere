@@ -85,7 +85,7 @@ class UsersService {
      * Get the most recently registered users.
      */
     public function getNewUsers($count = 10) {
-        $users = $this->db->query("SELECT * FROM hoos_there_users ORDER BY id DESC LIMIT $count");
+        $users = $this->db->query("SELECT id, name FROM hoos_there_users ORDER BY id DESC LIMIT $count");
         return $users;
     }
 
