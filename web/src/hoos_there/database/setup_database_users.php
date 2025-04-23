@@ -35,6 +35,8 @@ pg_query($dbHandle, "CREATE TABLE IF NOT EXISTS hoos_there_users (
     major TEXT NOT NULL DEFAULT '',
     hometown TEXT NOT NULL DEFAULT '',
     description TEXT NOT NULL DEFAULT '',
+    karma_avg NUMERIC(10,3) DEFAULT 0,
+    karma_votes INT DEFAULT 0,
     CHECK (year > 0)
 );");
 

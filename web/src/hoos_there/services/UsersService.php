@@ -15,7 +15,7 @@ class UsersService {
     public function getUserByID($user_id) {
         // Make sure not to leak password
         $users = $this->db->query(
-            "SELECT id, name, email, year, major, hometown, description
+            "SELECT id, name, email, year, major, hometown, description, karma_avg, karma_votes
             FROM hoos_there_users WHERE id = $1;", $user_id
         );
         if (empty($users)) return null;

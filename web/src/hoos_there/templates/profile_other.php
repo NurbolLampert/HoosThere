@@ -43,7 +43,11 @@
         <p><strong>Hometown:</strong> <?=$user["hometown"]?></p>
         <p><strong>Description:</strong></p>
         <p><?=$user["description"]?></p>
-        <p><strong>Karma Score:</strong> 8.5</p>
+        <p id="profileKarma">
+          <strong>Karma Score:</strong>
+          <span class="avg"><?= number_format($user["karma_avg"],3) ?></span> / 10
+          <small class="text-muted">(<span class="votes"><?= $user["karma_votes"] ?></span>)</small>
+        </p>
       </div>
     </section>
 

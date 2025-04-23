@@ -138,6 +138,11 @@ class AcademicsService {
             DO UPDATE SET points = $3",
             $recordId, $raterId, $points
         );
+        // find record owner -> refresh their karma cache
+        $owner = $this->db->query(
+            "SELECT user_id FROM academic_records WHERE id = $1", $recordId
+        )[0]["user_id"];
+        $this->recomputeUserKarma($owner);
     }
 
     public function getKarmaSummary($recordId, $viewerId=null){
@@ -151,6 +156,26 @@ class AcademicsService {
             $base["my"] = $mine ? $mine[0]["points"] : null;
         }
         return $base;
+    }
+
+    public function recomputeUserKarma(int $ownerId) : array{
+        $row = $this->db->query(
+            "SELECT COALESCE(AVG(points),0)::numeric(10,3) AS avg,
+                    COUNT(points) AS votes
+               FROM academic_records r
+               LEFT JOIN academic_karma k ON k.record_id = r.id
+              WHERE r.user_id = $1",
+            $ownerId
+        )[0];
+    
+        $this->db->query(
+            "UPDATE hoos_there_users
+                SET karma_avg   = $1,
+                    karma_votes = $2
+              WHERE id = $3",
+            $row["avg"], $row["votes"], $ownerId
+        );
+        return $row;
     }
     
 }

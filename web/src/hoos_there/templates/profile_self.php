@@ -71,7 +71,10 @@
             ><?=$user["description"]?></textarea>
           </div>
 
-          <p><strong>Karma Score:</strong> 7.2</p>
+          <p id="profileKarma"><strong>Karma Score:</strong>
+            <span class="avg"><?= number_format($user["karma_avg"],3) ?></span> / 10
+            <small class="text-muted">(<span class="votes"><?= $user["karma_votes"] ?></span>)</small>
+          </p>
 
           <button type="submit" class="btn btn-primary" onclick="updateProfile(); return false">Save Profile</button>
         </form>
