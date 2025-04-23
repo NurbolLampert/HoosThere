@@ -16,6 +16,7 @@ class HoosThereController {
         $this->input = $input;
         $this->include_path = $include_path;
         if ($is_remote) {
+            // Create the RemoteConfig class when deploying
             // $this->db = new Database(RemoteConfig::$db);
         } else {
             $this->db = new Database(LocalConfig::$db);

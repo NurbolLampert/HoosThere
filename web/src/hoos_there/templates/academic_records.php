@@ -67,6 +67,30 @@
                     </form>
                   </div>
                 </div>
+
+                <!-- Show Teammates -->
+                <div class="row g-2 mb-2 align-items-center">
+                  
+                  <?php
+                    $teammates = $service->getTeammates($record["id"]);
+
+                    if (!empty($teammates)) {
+                      echo '<div class="col-auto mb-3">';
+                      echo 'Teammates: ';
+                      echo '</div>';
+                    }
+
+                    foreach ($teammates as $teammate) {
+                      $avatar = $this->getUserAvatar($teammate["id"]);
+                      echo '<div class="col-auto mb-3">';
+                      echo '<img src=' . $avatar .' alt="" class="friend-avatar-xs">';
+                      echo '<a class="link-primary link-underline-opacity-0" href="?command=profile&id=' . $teammate["id"] . '">';
+                      echo $teammate["name"];
+                      echo "</a>";
+                      echo "</div>";
+                    }
+                  ?>
+                </div>
               </li>
               <?php endforeach; ?>
             </ul>
