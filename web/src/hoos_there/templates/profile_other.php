@@ -95,7 +95,103 @@
         <?php endforeach; ?>
       </div>
     </section>
-   
+
+    <!-- PERSONAL PROJECTS -->
+    <?php if ($acadData["projects"]): ?>
+    <section class="mt-4 section-card">
+      <h2 class="fs-3">Projects</h2>
+      <?php foreach ($acadData["projects"] as $p): ?>
+        <div class="card mb-2">
+          <div class="card-body">
+            <h5 class="card-title mb-1"><?=htmlspecialchars($p["project_title"])?></h5>
+            <p class="card-text"><?=nl2br(htmlspecialchars($p["description"]))?></p>
+          </div>
+        </div>
+      <?php endforeach;?>
+    </section>
+    <?php endif; ?>
+
+    <!-- FUTURE GOALS -->
+    <?php if ($acadData["goals"]): ?>
+    <section class="mt-4 section-card">
+      <h2 class="fs-3">Future Goals</h2>
+      <p><?=nl2br(htmlspecialchars($acadData["goals"][0]["goal_description"]))?></p>
+    </section>
+    <?php endif; ?>
+
+    <!-- SOCIAL & PROFESSIONAL LIFE -->
+    <section class="mt-4 section-card">
+      <h2 class="fs-3">Experience & Campus Life</h2>
+
+      <?php if ($social["experiences"]): ?>
+        <h4 class="fs-5 mt-3">Work Experience</h4>
+        <ul class="list-group slim mb-3">
+          <?php foreach ($social["experiences"] as $e): ?>
+            <li class="list-group-item">
+              <strong><?=htmlspecialchars($e["role"])?></strong>
+              <br><?=nl2br(htmlspecialchars($e["description"]))?>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
+
+      <?php if ($social["education"]): ?>
+        <h4 class="fs-5 mt-3">Education</h4>
+        <ul class="list-group slim mb-3">
+          <?php foreach ($social["education"] as $ed): ?>
+            <li class="list-group-item">
+              <strong><?=htmlspecialchars($ed["institution"])?></strong>
+              <br><?=htmlspecialchars($ed["degree"])?>
+              <small class="text-muted"> (<?=htmlspecialchars($ed["expected_graduation"])?>)</small>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
+
+      <?php if ($social["clubs"]): ?>
+        <h4 class="fs-5 mt-3">Student Organizations</h4>
+        <ul class="list-group slim mb-3">
+          <?php foreach ($social["clubs"] as $c): ?>
+            <li class="list-group-item">
+              <?=htmlspecialchars($c["name"])?>
+              <?php if ($c["role"]): ?>
+                — <small><?=htmlspecialchars($c["role"])?></small>
+              <?php endif; ?>
+              <?php if ($c["year"]): ?>
+                <small class="text-muted">(<?=htmlspecialchars($c["year"])?>)</small>
+              <?php endif; ?>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
+
+      <?php if ($social["volunteering"]): ?>
+        <h4 class="fs-5 mt-3">Volunteering</h4>
+        <ul class="list-group slim mb-3">
+          <?php foreach ($social["volunteering"] as $v): ?>
+            <li class="list-group-item">
+              <strong><?=htmlspecialchars($v["organization"])?></strong>
+              <br><?=nl2br(htmlspecialchars($v["description"]))?>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
+
+      <?php if ($social["social"]): ?>
+        <h4 class="fs-5 mt-3">Social Links</h4>
+        <?php $links = $social["social"]; ?>
+        <?php if ($links["instagram"]): ?>
+          <a href="<?=$links["instagram"]?>" target="_blank" class="me-2">Instagram</a>
+        <?php endif; ?>
+        <?php if ($links["linkedin"]): ?>
+          <a href="<?=$links["linkedin"]?>"  target="_blank" class="me-2">LinkedIn</a>
+        <?php endif; ?>
+        <?php if ($links["facebook"]): ?>
+          <a href="<?=$links["facebook"]?>"  target="_blank" class="me-2">Facebook</a>
+        <?php endif; ?>
+      <?php endif; ?>
+    </section>
+    
     <!-- Mutual Friends Section -->
     <section class="mt-4 section-card">
       <h2 class="fs-3" id="mutual-friends-list-text">Mutual Friends (0)</h2>

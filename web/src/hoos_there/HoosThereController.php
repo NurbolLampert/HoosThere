@@ -414,7 +414,6 @@ class HoosThereController {
         } else if (!is_null($this->getUserInfo($user_id))) {
             $acadSvc   = new AcademicsService($this->db);
             $acadData  = $acadSvc->getRecords($user_id);          // <= grouped, projects, goals
-            $socSvc    = new SocialProfessionalService($this->db);
         
             // add teammate flags for the viewer
             foreach ($acadData["grouped"] as &$terms)
@@ -424,6 +423,9 @@ class HoosThereController {
                   $mine = $acadSvc->getKarmaSummary($r["id"], $_SESSION["user_id"]);
                   $r["viewer_rating"] = $mine["my"];  
                 }
+            
+            $socSvc    = new SocialProfessionalService($this->db);
+            $social   = $socSvc->getSocialProfessionalData($user_id); 
         
             include($this->include_path . "/templates/profile_other.php");
         } else {
