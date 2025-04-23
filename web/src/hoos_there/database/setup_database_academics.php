@@ -70,10 +70,12 @@ $res = pg_query_params($dbHandle, "SELECT id FROM hoos_there_users WHERE email =
 $demoUserId = pg_fetch_result($res, 0, 'id');
 
 // Records
+// Add two projects for Demo (1), Foo (2), and Bar (3) users
 $demoRecords = [
-    [4, 'Fall', 'TEST 1230', 'Test Course 1', 'Test Project 1', '', 0],
+    [4, 'Fall',   'TEST 1230', 'Test Course 1', 'Test Project 1', '', 0],
     [4, 'Spring', 'TEST 1240', 'Test Course 2', 'Test Project 2', '', 0]
 ];
+
 foreach ($demoRecords as $demoRecord) {
     for ($i = 1; $i <= 3; $i++) {
         pg_query_params(
@@ -86,17 +88,18 @@ foreach ($demoRecords as $demoRecord) {
 }
 
 // Teammates
+// Make Demo, Foo, and Bar users teammates on the two projects
 $teammates = [
     [
-        "record_ids" => [1, 4],
+        "record_ids" => [1, 4], // Demo's projects
         "teammate_ids" => [2, 3]
     ],
     [
-        "record_ids" => [2, 5],
+        "record_ids" => [2, 5], // Foo's projects
         "teammate_ids" => [1, 3]
     ],
     [
-        "record_ids" => [3, 6],
+        "record_ids" => [3, 6], // Bar's projects
         "teammate_ids" => [1, 2]
     ]
 ];
@@ -114,25 +117,26 @@ foreach ($teammates as $t) {
 }
 
 // Karma
+// Give Demo user a rating by the two teammates on the two projects
 $karma_entries = [
     [
-        "record_id" => 1,
-        "rater_id" => 2,
+        "record_id" => 1, // Demo's project 1
+        "rater_id" => 2, // Foo
         "points" => 10
     ],
     [
-        "record_id" => 1,
-        "rater_id" => 3,
+        "record_id" => 1, // Demo's project 1
+        "rater_id" => 3, // Bar
         "points" => 7
     ],
     [
-        "record_id" => 4,
-        "rater_id" => 2,
+        "record_id" => 4, // Demo's project 2
+        "rater_id" => 2, // Foo
         "points" => 8
     ],
     [
-        "record_id" => 4,
-        "rater_id" => 3,
+        "record_id" => 4, // Demo's project 3
+        "rater_id" => 3, // Bar
         "points" => 4
     ]
 ];
