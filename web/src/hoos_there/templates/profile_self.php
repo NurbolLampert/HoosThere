@@ -156,19 +156,5 @@
   <script>
     getFriendsList();
   </script>
-  <style>
-    .friend-pic-sm {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      object-fit: cover;   
-    }
-    .friend-avatar-xs { 
-      width:40px;
-      height:40px;
-      border-radius:50%;
-      object-fit:cover; 
-    }
-  </style>
 </body>
 </html>

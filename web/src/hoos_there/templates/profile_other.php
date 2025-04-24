@@ -65,10 +65,11 @@
             </h2>
             <div id="c<?=$year?>" class="accordion-collapse collapse" data-bs-parent="#yearAccordion">
               <div class="accordion-body">
-                <?php foreach ($terms as $term=>$records): ?>
+                <!-- Loop through noly array keys rather than key-value pairs -->
+                <?php foreach (array_keys($terms) as $term): ?>
                   <h5 class="fw-semibold"><?=$term?> Term</h5>
                   <ul class="list-group slim mb-3">
-                  <?php foreach ($records as $rec): ?>
+                  <?php foreach ($terms[$term] as $rec): ?>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span><?=$rec["course_code"]?> – <?=$rec["course_name"]?></span>
                         <span>
