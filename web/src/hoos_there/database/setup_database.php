@@ -14,5 +14,6 @@ if ($dbHandle) {
 include($include_path . "/database/setup_database_users.php");
 include($include_path . "/database/setup_database_socials.php");
 include($include_path . "/database/setup_database_academics.php");
+include($include_path . "/database/setup_database_samples.php");
 
 echo "Success setting up database<br>\n";
