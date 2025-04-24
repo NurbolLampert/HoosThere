@@ -1,10 +1,13 @@
 <?php
 /**
  * Team Mambers:
- * - Eric Weng (front controller, user accounts)
- * - Nurbol Lampert (page layout, user socials and academics)
+ * - Eric Weng (front controller, user accounts, friends)
+ * - Nurbol Lampert (page layouts, socials and academics, karma)
  * 
- * Hosted Version: https://cs4640.cs.virginia.edu/qgt7zm/project/index.php
+ * Hosted Version
+ * - Sprint 1-2:  https://cs4640.cs.virginia.edu/qgt7zm/project/index.html
+ * - Sprint 3-4:  https://cs4640.cs.virginia.edu/qgt7zm/project/index.php
+ * - Deliverable: https://cs4640.cs.virginia.edu/qgt7zm/hoosthere/index.php
  */
 
 // For debugging: show errors
@@ -15,10 +18,11 @@ ini_set("display_errors", 1);
 $is_remote = false;
 if ($is_remote) {
     $include_path = "/students/qgt7zm/students/qgt7zm/private";
+    $include_path .= "/hoos_there_deliverable";
 } else {
     $include_path = "/opt/src";
+    $include_path .= "/hoos_there";
 }
-$include_path .= "/hoos_there";
 
 // Class autoloading
 spl_autoload_register(function ($classname) use ($include_path) {
@@ -28,7 +32,7 @@ spl_autoload_register(function ($classname) use ($include_path) {
 // Run the database script
 $reset_db = false;
 if ($reset_db) {
-    include($include_path . "/setup_database.php");
+    include($include_path . "/database/setup_database.php");
     exit();
 }
 

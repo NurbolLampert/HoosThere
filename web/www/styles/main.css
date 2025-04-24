@@ -115,7 +115,7 @@ h1, h2, h3 {
   color: #fff;
 }
 
-.btn-danger {
+.btn-del {
   color: #fff;
   border: none;
   padding: 0.4rem 0.6rem;
@@ -125,6 +125,57 @@ h1, h2, h3 {
   border-radius: 4px;
 }
 
-.btn-danger:hover {
+.btn-del:hover {
   background-color: #740000;
+}
+
+.section-card {
+  border: 1px solid var(--bs-border-color);
+  border-radius: .75rem;
+  padding: 1.25rem 1rem;
+  background: var(--bs-body-bg);
+  box-shadow: 0 1px .75rem rgba(0,0,0,.05);
+}
+
+.list-group.slim > .list-group-item {
+  padding: .5rem .75rem;
+  border: none;                /* no separators */
+}
+.list-group.slim > .list-group-item:not(:last-child){
+  border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+
+.tr-hover tbody tr:hover,
+.list-group.slim > .list-group-item:hover {
+  background-color: var(--bs-light-bg-subtle);
+}
+
+.badge-count {
+  font-size: .8rem;
+  padding: .35em .55em;
+}
+
+.modal-title::before{
+  content:"🧑‍🤝‍🧑";
+  margin-right:.35rem;
+}
+
+.friend-pic-xxs {
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  object-fit:cover;
+}
+
+.friend-pic-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;   
+}
+.friend-avatar-xs { 
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  object-fit:cover; 
 }

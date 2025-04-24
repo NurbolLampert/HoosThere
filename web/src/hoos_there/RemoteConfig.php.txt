@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * Remote database configuration for PostgreSQL.
+ */
+class RemoteConfig {
+
+    public static $db = [
+        "host" => "<Your host here>",
+        "port" => <Your port here>,
+        "user" => "<Your user here>",
+        "password" => "<Your password here>", // Never reveal publically!
+        "dbname" => "<Your DB name here>"
+    ];
+
+}

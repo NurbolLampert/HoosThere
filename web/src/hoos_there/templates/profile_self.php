@@ -19,7 +19,7 @@
   <main class="container my-4">
     <h1 class="fs-2">Your Profile</h1>
 
-    <div class="row">
+    <div class="row" id="alerts">
       <?=$this->showAlert()?>
     </div>
 
@@ -40,7 +40,7 @@
         <h2 class="fs-3"><?=$user["name"]?></h2>
 
         <!-- Profile Form -->
-        <form action="?command=update_profile" method="post">
+        <form>
           <p><strong>Graduating Year:</strong> <?=$user["year"]?></p>
           
           <div class="row mb-3 align-items-center">
@@ -71,65 +71,72 @@
             ><?=$user["description"]?></textarea>
           </div>
 
-          <p><strong>Karma Score:</strong> 7.2</p>
+          <p id="profileKarma"><strong>Karma Score:</strong>
+            <span class="avg"><?= number_format($user["karma_avg"],3) ?></span> / 10
+            <small class="text-muted">(<span class="votes"><?= $user["karma_votes"] ?></span>)</small>
+          </p>
 
-          <button type="submit" class="btn btn-primary">Save Profile</button>
+          <button type="submit" class="btn btn-primary" onclick="updateProfile(); return false">Save Profile</button>
         </form>
       </div>
     </section>
 
-    <!-- Friends Section -->
-    <section>
-      <h2 class="fs-3">Friends List</h2>
-      <div class="row" id="friends-list-row">
-          <div class="col-md-4 p-3 d-flex align-items-center friend-col">
-            <img src="profile-avatars/2f.jpg" alt="Friend 1 avatar" class="friend-pic me-2">
-            <a href="?command=profile" class="link-primary link-underline-opacity-0 me-2">Erin</a>
-            <button class="btn btn-danger btn-remove">Remove</button>
-          </div>
+    <section class="mt-4 section-card">
+      <h2 class="fs-3 d-inline me-2">
+          Friends: <span id="friendCount">0</span>
+      </h2>
 
-          <div class="col-md-4 p-3 d-flex align-items-center friend-col">
-            <img src="profile-avatars/5m.jpg" alt="Friend 2 avatar" class="friend-pic me-2">
-            <a href="?command=profile" class="link-primary link-underline-opacity-0 me-2">Nate</a>
-            <button class="btn btn-danger btn-remove">Remove</button>
-          </div>
+      <button class="btn btn-sm btn-outline-primary"
+              id="openFriendsBtn"
+              data-bs-toggle="modal"
+              data-bs-target="#friendsModal">
+          View Friends
+      </button>
 
-          <div class="col-md-4 p-3 d-flex align-items-center friend-col">
-            <img src="profile-avatars/4m.jpg" alt="Friend 3 avatar" class="friend-pic me-2">
-            <a href="?command=profile" class="link-primary link-underline-opacity-0 me-2">Lola</a>
-            <button class="btn btn-danger btn-remove">Remove</button>
-          </div>
-
-          <div class="col-md-4 p-3 d-flex align-items-center friend-col">
-            <img src="profile-avatars/3m.jpg" alt="Friend 4 avatar" class="friend-pic me-2">
-            <a href="?command=profile" class="link-primary link-underline-opacity-0 me-2">Jim</a>
-            <button class="btn btn-danger btn-remove">Remove</button>
-          </div>
-
-          <div class="col-md-4 p-3 d-flex align-items-center friend-col">
-            <img src="profile-avatars/1f.jpg" alt="Friend 5 avatar" class="friend-pic me-2">
-            <a href="?command=profile" class="link-primary link-underline-opacity-0 me-2">Mikey</a>
-            <button class="btn btn-danger btn-remove">Remove</button>
-          </div>
-        </div>
+      <h3 class="fs-5 mt-3">Look up Hoos</h3>
+      <input type="search"
+            id="userSearch"
+            class="form-control mb-2"
+            placeholder="Type a name…">
+      <ul id="searchResults" class="list-group slim"></ul>
     </section>
 
-    <section>
-      <h3 class="fs-4">Find a New Friend</h3>
-      <form id="add-friend-form" action="#" method="post" aria-label="Add new friend form">
-        <div class="mb-3">
-          <label for="friendName" class="form-label">Name:</label>
-          <input
-            type="text"
-            id="friendName"
-            name="friendName"
-            class="form-control"
-            placeholder="Enter a friend's name"
-            required
-          >
+    <div class="modal fade" id="friendsModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Your Friends</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-0">
+            <table class="table table-sm align-middle mb-0 tr-hover">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col"></th>
+                  <th>Name</th>
+                  <th>Grad Year</th>
+                  <th>Major</th>
+                  <th class="text-end"></th>
+                </tr>
+              </thead>
+              <tbody id="friendsTableBody"></tbody>
+            </table>
+          </div>
         </div>
-        <button type="submit" class="btn btn-primary">Add Friend</button>
-      </form>
+      </div>
+    </div>
+
+    <section class="mt-4 section-card">
+      <h3 class="fs-4">
+        Friend Requests
+        <span class="badge bg-secondary badge-count" id="requestCount">0</span>
+        <button class="btn btn-link p-0 ms-1" data-bs-toggle="collapse" data-bs-target="#reqCollapse">
+          show / hide
+        </button>
+      </h3>
+      <div id="reqCollapse" class="collapse show">
+        <div id="friendRequestsBody" class="mt-2"></div>
+      </div>
     </section>
   </main>
 
@@ -140,10 +147,14 @@
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
   ></script>
-
-  <!-- JavaScript to handle removing and adding friends -->
-  <script
-    src="scripts/friends-list.js"
-  ></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/update-profile.js"></script>
+  <script src="scripts/friends-list.js"></script>  
+  <script src="scripts/user-search.js"></script>
+  <script src="scripts/friend-requests.js"></script>
+  <script src="scripts/friends-modal.js"></script>
+  <script>
+    getFriendsList();
+  </script>
 </body>
 </html>

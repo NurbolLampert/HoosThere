@@ -1,6 +1,8 @@
 <?php
+require_once("services/UsersService.php");
 require_once("services/AcademicsService.php");
 require_once("services/SocialProfessionalService.php");
+
 /**
  * Front controller for HoosThere app.
  */
@@ -14,7 +16,8 @@ class HoosThereController {
         $this->input = $input;
         $this->include_path = $include_path;
         if ($is_remote) {
-            $this->db = new Database(RemoteConfig::$db);
+            // Create the RemoteConfig class when deploying
+            // $this->db = new Database(RemoteConfig::$db);
         } else {
             $this->db = new Database(LocalConfig::$db);
         }
@@ -52,7 +55,7 @@ class HoosThereController {
                 $this->showProfile();
                 break;
             case "update_profile":
-                $this->checkLoggedInOrExit();
+                $this->checkLoggedInOrReturnFail();
                 $this->updateProfile();
                 break;
             case "user_data":
@@ -75,9 +78,17 @@ class HoosThereController {
                 $this->checkLoggedInOrExit();
                 $this->addAcademicRecord();
                 break;
+            case "delete_record":
+                $this->checkLoggedInOrExit();
+                $this->deleteAcademicRecord();
+                break;
             case "update_project":
                 $this->checkLoggedInOrExit();
                 $this->updateProject();
+                break;
+            case "delete_project":
+                $this->checkLoggedInOrExit();
+                $this->deleteProject();
                 break;
             case "add_project":
                 $this->checkLoggedInOrExit();
@@ -92,7 +103,7 @@ class HoosThereController {
                 $this->showSocial();
                 break;
             case "update_social_links":
-                $this->checkLoggedInOrExit();
+                $this->checkLoggedInOrReturnFail();
                 $this->updateSocialLinks();
                 break;
             case "add_experience":
@@ -127,6 +138,42 @@ class HoosThereController {
                 $this->checkLoggedInOrExit();
                 $this->updateVolunteer();
                 break;
+            case "search_users":
+                $this->checkLoggedInOrReturnFail();
+                $this->searchUsers();
+                break;
+            case "get_friends":
+                $this->checkLoggedInOrReturnFail();
+                $this->getFriends();
+                break;
+            case "add_friend":
+                $this->checkLoggedInOrReturnFail();
+                $this->addFriend();
+                break;
+            case "remove_friend":
+                $this->checkLoggedInOrReturnFail();
+                $this->removeFriend();
+                break;
+            case "get_mutual_friends":
+                $this->checkLoggedInOrReturnFail();
+                $this->getMutualFriends();
+                break;
+            case "send_friend_request":
+                $this->checkLoggedInOrReturnFail();
+                $this->sendFriendRequest();       
+                break;
+            case "get_friend_requests":
+                $this->checkLoggedInOrReturnFail();
+                $this->getFriendRequests();       
+                break;
+            case "act_on_request":
+                $this->checkLoggedInOrReturnFail();
+                $this->actOnRequest();            
+                break;
+            case "rate_project":
+                $this->checkLoggedInOrReturnFail();
+                $this->rateProject();
+                break;                
             case "home":
             default:
                 $this->showHome();
@@ -156,18 +203,18 @@ class HoosThereController {
             $this->createAlert("Please provide a UVA email.", "danger");
             $this->redirectPage("home");
             return;
-        }        
+        }
 
         // Check if user exists
-        $users = $this->db->query("SELECT * FROM hoos_there_users WHERE email = $1;", $email);
-        if (empty($users)) {
+        $service = new UsersService($this->db);
+        $user = $service->getUserByEmail($email);
+        if (is_null($user)) {
             $this->createAlert("Email not found. Please register a new account.", "danger");
             $this->redirectPage("home&register=0");
             return;
         }
 
         // Verify password correct
-        $user = $users[0];
         if (!password_verify($_POST["password"], $user["password"])) {
             $this->createAlert("Incorrect password for user $email.", "danger");
             header("Location: ?command=welcome");
@@ -213,8 +260,9 @@ class HoosThereController {
         }
 
         // Check if user exists
-        $users = $this->db->query("SELECT * FROM hoos_there_users WHERE email = $1;", $email);
-        if (!empty($users)) {
+        $service = new UsersService($this->db);
+        $user = $service->getUserByEmail($email);
+        if (!is_null($user)) {
             $this->createAlert("Account already exists. Please login.", "danger");
             $this->redirectPage("home&register=1");
             return;
@@ -230,20 +278,11 @@ class HoosThereController {
         
         // Create new user
         $name = $_POST["name"];
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $this->db->query(
-            "INSERT INTO hoos_there_users (name, year, email, password)
-            VALUES ($1, $2, $3, $4)",
-            $name, $year, $email, $hashed_password
-        );
-
-        // Fetch new user
-        $users = $this->db->query("SELECT * FROM hoos_there_users WHERE email = $1;", $email);
-        $user = $users[0];
+        $user_id = $service->createUser($name, $year, $email, $password);
         $this->createAlert("Created new user $name with email $email.", "success");
 
         // Redirect to user profile
-        $_SESSION["user_id"] = $user["id"];
+        $_SESSION["user_id"] = $user_id;
         $this->redirectPage("profile&id=" . $_SESSION["user_id"]);
     }
 
@@ -276,7 +315,8 @@ class HoosThereController {
         session_start();
         setcookie("user_id", "", 0, "/"); // Clear user id from cookie
 
-        $this->db->query("DELETE FROM hoos_there_users WHERE id = $1;", $user_id);
+        $service = new UsersService($this->db);
+        $service->deleteUser($user_id);
         $this->createAlert("Account $email deleted. Sorry so see you go!", "success");
         $this->redirectPage("home");
     }
@@ -291,13 +331,24 @@ class HoosThereController {
     }
 
     /** 
-     * Check user is logged in and exit if not.
+     * Check user is logged in and redirect to the homepage if not.
      */
     private function checkLoggedInOrExit() {
         if (!$this->isLoggedIn()) {
             $this->createAlert("You must be logged in to continue.", "danger");
             $this->redirectPage("home");
-            exit();
+            exit(1);
+        }
+    }
+
+    /** 
+     * Check user is logged in return a JSON failure reponse if not.
+     */
+    private function checkLoggedInOrReturnFail() {
+        if (!$this->isLoggedIn()) {
+            $data = ["result" => "failure"];
+            $this->showJSONResponse($data);
+            exit(1);
         }
     }
 
@@ -310,29 +361,16 @@ class HoosThereController {
             $user_id = $_SESSION["user_id"];
         }
 
-        $users = $this->db->query("SELECT * FROM hoos_there_users WHERE id = $1;", $user_id);
-        if (empty($users)) {
-            return array();
-        } else {
-            return $users[0];
-        }
-    }
-
-    /**
-     * The the ten most recently registered users.
-     */
-    public function getNewUsers() {
-        $users = $this->db->query("SELECT * FROM hoos_there_users ORDER BY id DESC LIMIT 10");
-        return $users;
+        $service = new UsersService($this->db);
+        return $service->getUserByID($user_id);
     }
 
     /**
      * Get the filename of the user avatar.
      */
     public function getUserAvatar($user_id) {
-        $avatars = ["1f", "2f", "3m", "4m", "5m"];
-        $avatar = $avatars[(($user_id - 1) % 5)];
-        return "profile-avatars/$avatar.jpg";
+        $num = (($user_id - 1) % 10) + 1; // 1-10
+        return "profile-avatars/avatar$num.png";
     }
 
     // Show View Methods
@@ -341,7 +379,6 @@ class HoosThereController {
      * Show the home screen.
      */
     private function showHome() {
-
         if ($this->isLoggedIn()) {
             // Logout screen
             $this->showTemplate("home_logged_in.php");
@@ -368,18 +405,28 @@ class HoosThereController {
      */
     private function showProfile() {
         // Get id of user to view
-        if (isset($this->input["id"])) {
-            $user_id = $this->input["id"];
-        } else {
-            $user_id = $_SESSION["user_id"]; // Default to own user
-        }
+        $user_id = $this->input["id"] ?? $_SESSION["user_id"]; // Default to own user
 
         if ($user_id == $_SESSION["user_id"]) {
             // Show own profile
-            // Can't use method because $user_id will not be visible
+            // Can't use helper method because $user_id will not be visible
             include($this->include_path . "/templates/profile_self.php");
-        } else if (!empty($this->getUserInfo($user_id))) {
-            // Show other profile
+        } else if (!is_null($this->getUserInfo($user_id))) {
+            $acadSvc   = new AcademicsService($this->db);
+            $acadData  = $acadSvc->getRecords($user_id);          // <= grouped, projects, goals
+        
+            // add teammate flags for the viewer
+            foreach ($acadData["grouped"] as &$terms)
+              foreach ($terms as &$records)
+                foreach ($records as &$r) {
+                  $r["viewer_is_teammate"] = $acadSvc->userIsTeammate($r["id"], $_SESSION["user_id"]);
+                  $mine = $acadSvc->getKarmaSummary($r["id"], $_SESSION["user_id"]);
+                  $r["viewer_rating"] = $mine["my"];  
+                }
+            
+            $socSvc    = new SocialProfessionalService($this->db);
+            $social   = $socSvc->getSocialProfessionalData($user_id); 
+        
             include($this->include_path . "/templates/profile_other.php");
         } else {
             // User does not exist
@@ -393,34 +440,37 @@ class HoosThereController {
      */
     private function updateProfile() {
         // Clean form data
-        if (isset($_POST["major"])) {
-            $major = $_POST["major"];
-        } else {
-            $major = "";
-        }
+        $major = $_POST["major"] ?? "";
+        $hometown = $_POST["hometown"] ?? "";
+        $description = $_POST["description"] ?? "";
+        $user_id = $_SESSION["user_id"];
 
-        if (isset($_POST["hometown"])) {
-            $hometown = $_POST["hometown"];
-        } else {
-            $hometown = "";
-        }
+        $service = new UsersService($this->db);
+        $service->updateUserProfile($user_id, $major, $hometown, $description);
 
-        if (isset($_POST["description"])) {
-            $description = $_POST["description"];
-        } else {
-            $description = "";
-        }
-
-        $this->db->query(
-            "UPDATE hoos_there_users
-            SET major = $1, hometown = $2, description = $3
-            WHERE id = $4",
-            $major, $hometown, $description, $_SESSION["user_id"]
-        );
-
-        // Redirect to user profile
-        $this->redirectPage("profile&id=" . $_SESSION["user_id"]);
+        $data = [
+            "user_id" => $user_id,
+            "major" => $major,
+            "hometown" => $hometown,
+            "description" => $description,
+            "result" => "success"
+        ];
+        $this->showJSONResponse($data);
     }
+
+    private function getNewUsers() {
+        $service = new UsersService($this->db);
+        $userData = $service->getNewUsers();
+        $newUsers = [];
+        foreach ($userData as $user) {
+            $avatar = $this->getUserAvatar($user["id"]);
+            $user["avatar"] = $avatar;
+            $newUsers[] = $user;
+        }
+        return $newUsers;
+    }
+
+    // Academics
 
     private function showAcademics() {
         $this->checkLoggedInOrExit();
@@ -459,15 +509,39 @@ class HoosThereController {
         $name = $_POST["course_name"];
         $teammate = $_POST["teammate_name"] ?? '';
         $project = $_POST["project_title"] ?? '';
-        $karma = $_POST["karma"] ?? null;
+        $karma = 0;
     
         $service = new AcademicsService($this->db);
-        $service->insertRecord($user_id, $year, $term, $code, $name, $teammate, $project, $karma);
+        $recordId = $service->addRecord($user_id, $year, $term, $code, $name, $teammate, $project, $karma);
+    
+        if (!empty($_POST["teammate_ids"])) {
+            $teammateIds = array_filter(array_map('intval',
+                        explode(',', $_POST["teammate_ids"])));
+            $service->addTeammates($recordId, $teammateIds);
+        }
     
         $this->createAlert("New academic record added!", "success");
         $this->redirectPage("academics");
     }
 
+    private function deleteAcademicRecord() {
+        $id = $this->input["id"] ?? null;
+        $confirm = $_POST["confirm"] ?? null;
+
+        if (!$id || $confirm !== '1') {
+            $this->createAlert("Missing record ID or confirmation.", "danger");
+            $this->redirectPage("academics");
+            return;
+        }
+    
+        $service = new AcademicsService($this->db);
+        $service->deleteRecord($id);
+    
+        $this->createAlert("Academic record deleted!", "success");
+        $this->redirectPage("academics");
+    }
+
+    // Projects
 
     private function updateProject() {
         $user_id = $_SESSION["user_id"];
@@ -489,17 +563,36 @@ class HoosThereController {
     }
     
     private function addProject() {
-        if (!isset($_POST["project_title"]) || !isset($_POST["description"])) {
-            $this->createAlert("Missing project title or description", "danger");
+        if (!isset($_POST["project_title"]) || !isset($_POST["project_description"])) {
+            $this->createAlert("Missing project title or description.", "danger");
             $this->redirectPage("academics");
             return;
         }
     
         $service = new AcademicsService($this->db);
-        $service->addProject($_SESSION["user_id"], $_POST["project_title"], $_POST["description"]);
+        $service->addProject($_SESSION["user_id"], $_POST["project_title"], $_POST["project_description"]);
         $this->createAlert("Project added!", "success");
         $this->redirectPage("academics");
     }
+
+    private function deleteProject() {
+        $id = $this->input["id"] ?? null;
+        $confirm = $_POST["confirm"] ?? null;
+
+        if (!$id || $confirm !== '1') {
+            $this->createAlert("Missing project ID or confirmation.", "danger");
+            $this->redirectPage("academics");
+            return;
+        }
+    
+        $service = new AcademicsService($this->db);
+        $service->deleteProject($id);
+    
+        $this->createAlert("Project deleted!", "success");
+        $this->redirectPage("academics");
+    }
+
+    // Goals
     
     private function updateGoals() {
         if (!isset($_POST["goal_description"])) {
@@ -513,6 +606,8 @@ class HoosThereController {
         $this->createAlert("Goals updated!", "success");
         $this->redirectPage("academics");
     }
+
+    // Socials
     
     private function showSocial() {
         $service = new SocialProfessionalService($this->db);
@@ -522,15 +617,26 @@ class HoosThereController {
     
     private function updateSocialLinks() {
         $service = new SocialProfessionalService($this->db);
+        $user_id = $_SESSION["user_id"];
+        $instagram = $_POST["instagram"] ?? '';
+        $linkedin = $_POST["linkedin"] ?? '';
+        $facebook = $_POST["facebook"] ?? '';
+
         $service->updateSocialLinks(
-            $_SESSION["user_id"],
-            $_POST["instagram"] ?? '',
-            $_POST["linkedin"] ?? '',
-            $_POST["facebook"] ?? ''
+            $user_id, $instagram, $linkedin, $facebook
         );
-        $this->createAlert("Social media links updated!", "success");
-        $this->redirectPage("social");
+
+        $data = [
+            "user_id" => $user_id,
+            "instagram" => $instagram,
+            "linkedin" => $linkedin,
+            "facebook" => $facebook,
+            "result" => "success"
+        ];
+        $this->showJSONResponse($data);
     }
+
+    // Experiences
     
     private function addExperience() {
         $service = new SocialProfessionalService($this->db);
@@ -545,14 +651,27 @@ class HoosThereController {
     
     private function updateExperience() {
         $service = new SocialProfessionalService($this->db);
-        $service->updateExperience(
-            $_POST["id"],
-            $_POST["role"] ?? '',
-            $_POST["description"] ?? ''
-        );
-        $this->createAlert("Experience updated.", "success");
+        $id = $_POST["id"];
+        $role = $_POST["role"] ?? '';
+        $description = $_POST["description"] ?? '';
+
+        // Remove if all fields blank
+        if (empty($role) && empty($description)) {
+            $service->removeExperience($id);
+            $this->createAlert("Experience removed.", "success");
+        } else {
+            $service->updateExperience(
+                $_POST["id"],
+                $_POST["role"] ?? '',
+                $_POST["description"] ?? ''
+            );
+            $this->createAlert("Experience updated.", "success");
+        }
+        
         $this->redirectPage("social");
     }
+
+    // Education
 
     private function addEducation() {
         $service = new SocialProfessionalService($this->db);
@@ -568,15 +687,29 @@ class HoosThereController {
     
     private function updateEducation() {
         $service = new SocialProfessionalService($this->db);
-        $service->updateEducation(
-            $_POST["id"],
-            $_POST["degree"] ?? '',
-            $_POST["institution"] ?? '',
-            $_POST["expected_graduation"] ?? ''
-        );
-        $this->createAlert("Education updated.", "success");
+        $id = $_POST["id"];
+        $degree = $_POST["role"] ?? '';
+        $institution = $_POST["description"] ?? '';
+        $expected_graduation = $_POST["expected_graduation"] ?? '';
+        
+        // Remove if all fields blank
+        if (empty($degree) && empty($institution) && empty($expected_graduation)) {
+            $service->removeEducation($id);
+            $this->createAlert("Education removed.", "success");
+        } else {
+            $service->updateEducation(
+                $id,
+                $degree ?? '',
+                $instagram ?? '',
+                $expected_graduation ?? ''
+            );
+            $this->createAlert("Education updated.", "success");
+        }
+
         $this->redirectPage("social");
     }
+
+    // Clubs
     
     private function addClub() {
         $service = new SocialProfessionalService($this->db);
@@ -592,15 +725,29 @@ class HoosThereController {
     
     private function updateClub() {
         $service = new SocialProfessionalService($this->db);
-        $service->updateClub(
-            $_POST["id"],
-            $_POST["name"] ?? '',
-            $_POST["role"] ?? '',
-            $_POST["year"] ?? ''
-        );
-        $this->createAlert("Club/Organization updated.", "success");
+        $id = $_POST["id"];
+        $name = $_POST["name"] ?? '';
+        $role = $_POST["role"] ?? '';
+        $year = $_POST["year"] ?? '';
+
+        // Remove if all fields blank
+        if (empty($name) && empty($role) && empty($year)) {
+            $service->removeClub($id);
+            $this->createAlert("Club/organization removed.", "success");
+        } else {
+            $service->updateClub(
+                $id,
+                $name ?? '',
+                $role ?? '',
+                $role ?? ''
+            );
+            $this->createAlert("Club/organization updated.", "success");
+        }
+
         $this->redirectPage("social");
     }
+
+    // Volunteering
     
     private function addVolunteer() {
         $service = new SocialProfessionalService($this->db);
@@ -615,23 +762,177 @@ class HoosThereController {
     
     private function updateVolunteer() {
         $service = new SocialProfessionalService($this->db);
-        $service->updateVolunteer(
-            $_POST["id"],
-            $_POST["organization"] ?? '',
-            $_POST["description"] ?? ''
-        );
-        $this->createAlert("Volunteer experience updated.", "success");
+        $id = $_POST["id"];
+        $organization = $_POST["organization"] ?? '';
+        $description = $_POST["description"] ?? '';
+
+        // Remove if all fields blank
+        if (empty($organization) && empty($description)) {
+            $service->removeVolunteer($id);
+            $this->createAlert("Volunteer experience removed.", "success");
+        } else {
+            $service->updateVolunteer(
+                $id,
+                $organization ?? '',
+                $description ?? ''
+            );
+            $this->createAlert("Volunteer experience updated.", "success");
+        }
+        
         $this->redirectPage("social");
     }
+
+    // Friends
+
+    private function getFriends() {
+        $user_id = $_SESSION["user_id"];
+        $data = [
+            "user_id" => $user_id,
+            "result" => "success",
+            "friends" => []
+        ];
+
+        // Get friend IDs, names and avatars
+        $service = new UsersService($this->db);
+        $friends = $service->getFriendsList($user_id);
+        foreach ($friends as $friend) {
+            $avatar = $this->getUserAvatar($friend["id"]);
+            $friend["avatar"] = $avatar;
+            $data["friends"][] = $friend;
+        }
+        
+        $this->showJSONResponse($data);
+    }
+
+    private function getMutualFriends() {
+        // Clean form
+        $other_id = $this->input["id"] ?? null;
+        if (is_null($other_id)) {
+            $data = [
+                "result" => "failure"
+            ];
+            $this->showJSONResponse($data);
+            return;
+        }
+
+        // Check user exists
+        $service = new UsersService($this->db);
+        $other = $service->getUserByID($other_id);
+        if (is_null($other)) { 
+            $data = [
+                "result" => "failure"
+            ];
+            $this->showJSONResponse($data);
+            return;
+        }
+        
+        $user_id = $_SESSION["user_id"];
+        $data = [
+            "user_id" => $user_id,
+            "result" => "success",
+            "friends" => []
+        ];
+
+        // Get friend IDs, names and avatars
+        $service = new UsersService($this->db);
+        $friends = $service->getMutualFriendsList($user_id, $other_id);
+        foreach ($friends as $friend) {
+            $avatar = $this->getUserAvatar($friend["id"]);
+            $friend["avatar"] = $avatar;
+            $data["friends"][] = $friend;
+        }
+        
+        $this->showJSONResponse($data);
+    }
+
+    private function addFriend() {
+        $user_id = $_SESSION["user_id"];
+
+        // Look up friend id by name
+        $name = trim($_POST["name"]) ?? "";
+        $service = new UsersService($this->db);
+        $friend = $service->getUserByName($name);
+        
+        if (is_null($friend)) {
+            $friend_id = null;
+        } else {
+            $friend_id = $friend["id"];
+        }
+
+        if (is_null($friend_id)) { 
+            // Check user exists
+            $data = [
+                "result" => "failure",
+                "message" => "That user does not exist."
+            ];
+            $this->showJSONResponse($data);
+            return;
+        } else if ($user_id == $friend_id) {
+            // Check user exists
+            $data = [
+                "result" => "failure",
+                "message" => "You cannot friend yourself!"
+            ];
+            $this->showJSONResponse($data);
+            return;
+        } else if (!empty($service->areUsersFriends($user_id, $friend_id))) {
+            // Make sure not already friends
+            $data = [
+                "result" => "failure",
+                "message" => "You are already friends with this user."
+            ];
+            $this->showJSONResponse($data);
+            return;
+        }
+        
+        $friend_json = [
+            "id" => $friend_id,
+            "name" => $friend["name"],
+            "avatar" => $this->getUserAvatar($friend["id"])
+        ];
+
+        // Add friends
+        $service->addFriends($user_id, $friend_id);
+        
+        $data = [
+            "user_id" => $user_id,
+            "friend" => $friend_json,
+            "result" => "success"
+        ];
+        $this->showJSONResponse($data);
+    }
     
+    private function removeFriend() {
+        $user_id = $_SESSION["user_id"];
+
+        // Clean form
+        $friend_id = $_POST["id"] ?? null;
+        if (is_null($friend_id)) {
+            $data = [
+                "result" => "failure"
+            ];
+            $this->showJSONResponse($data);
+            return;
+        }
+
+        // Add friends
+        $service = new UsersService($this->db);
+        $service->removeFriends($user_id, $friend_id);
+        
+        $data = [
+            "user_id" => $user_id,
+            "friend_id" => $friend_id,
+            "result" => "success"
+        ];
+        $this->showJSONResponse($data);
+    }
 
     /**
      * Return the current user's data in JSON form.
      */
     private function showUserData() {
         $data = $this->getUserInfo();
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($data);
+        $this->showJSONResponse($data);
     }
 
     // View Helper Methods
@@ -666,4 +967,86 @@ class HoosThereController {
         header("Location: ?command=$command");
     }
 
+    private function showJSONResponse($obj) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($obj);
+    }
+
+    private function searchUsers() {
+        $term = trim($this->input["q"] ?? "");
+        $service = new UsersService($this->db);
+        $rows = $service->searchUsers($_SESSION["user_id"], $term);
+        $out = [];
+        foreach ($rows as $r) {
+            $out[] = [
+                "id" => $r["id"],
+                "name" => $r["name"],
+                "is_friend" => $r["is_friend"] === 't', 
+                "avatar" => $this->getUserAvatar($r["id"])
+            ];
+        }
+        $this->showJSONResponse(["result"=>"success", "matches"=>$out]);
+    }
+    
+    private function sendFriendRequest() {
+        $from = $_SESSION["user_id"];
+        $to   = intval($_POST["id"] ?? 0);
+        if (!$to || $from == $to) { $this->showJSONResponse(["result"=>"failure"]); return; }
+    
+        $svc = new UsersService($this->db);
+        $svc->createFriendRequest($from, $to);
+        $this->showJSONResponse(["result"=>"success"]);
+    }
+    
+    private function getFriendRequests() {
+        $svc   = new UsersService($this->db);
+        $rows  = $svc->getIncomingRequests($_SESSION["user_id"]);
+        $out   = [];
+        foreach ($rows as $r) {
+            $out[] = [
+              "id"      => $r["id"],
+              "from_id" => $r["from_user"],
+              "name"    => $r["name"],
+              "avatar"  => $this->getUserAvatar($r["from_user"]),
+              "ago"     => $this->timeAgo($r["created_at"])
+            ];
+        }
+        $this->showJSONResponse(["result"=>"success", "requests"=>$out]);
+    }
+    
+    private function actOnRequest() {
+        $id  = intval($_POST["request_id"] ?? 0);
+        $ok  = ($_POST["action"] ?? '') === 'accept';
+        $svc = new UsersService($this->db);
+        $svc->actOnRequest($id, $ok);
+        $this->showJSONResponse(["result"=>"success"]);
+    }
+    
+    /* helper */
+    private function timeAgo($ts) {
+        $delta = time() - strtotime($ts);
+        if ($delta < 60)               return $delta . " sec";
+        if ($delta < 3600)             return intdiv($delta,60) . " min";
+        if ($delta < 86400)            return intdiv($delta,3600) . " h";
+        return intdiv($delta,86400) . " d";
+    }
+
+    private function rateProject() {
+        $record  = intval($_POST["record_id"] ?? 0);
+        $points  = intval($_POST["points"] ?? -1);
+        $rater   = $_SESSION["user_id"];
+    
+        if ($points < 0 || $points > 10) {
+            $this->showJSONResponse(["result"=>"failure","msg"=>"Bad points"]); return;
+        }
+    
+        $svc = new AcademicsService($this->db);
+        if (!$svc->userIsTeammate($record, $rater)) {
+            $this->showJSONResponse(["result"=>"failure","msg"=>"Not a teammate"]); return;
+        }
+        $svc->saveKarma($record, $rater, $points);
+        $summary = $svc->getKarmaSummary($record);
+        $this->showJSONResponse(["result"=>"success"] + $summary);
+    }
+    
 }

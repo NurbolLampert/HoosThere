@@ -64,18 +64,19 @@
       <div class="col-md-6">
         <h2>New Users</h2>
 
-        <ul>
+        <div class="row section-card">
           <?php
             $users = $this->getNewUsers();
             foreach ($users as $user) {
-              echo "<li>";
-              echo '<a href="?command=profile&id=' . $user["id"] . '">';
+              echo '<div class="col-6 mb-3">';
+              echo '<img src=' . $user["avatar"] .' alt="" class="friend-avatar-xs">';
+              echo '<a class="link-primary link-underline-opacity-0" href="?command=profile&id=' . $user["id"] . '">';
               echo $user["name"];
               echo "</a>";
-              echo "</li>";
+              echo "</div>";
             }
           ?>
-        </ul>
+        </div>
       </div>
     </div>
 

@@ -7,9 +7,19 @@ class AcademicsService {
         $this->db = $db;
     }
 
-    public function getRecords($user_id) {
-        $result = $this->db->query("SELECT * FROM academic_records WHERE user_id = $1", $user_id);
+    // Records
 
+    public function getRecords($user_id) {
+        $result = $this->db->query("SELECT ar.*, 
+                    COALESCE(k.avg,0) AS karma_avg, 
+                    COALESCE(k.n,0)   AS karma_votes
+            FROM academic_records ar
+            LEFT JOIN (
+                SELECT record_id, AVG(points)::numeric(10,3) AS avg, COUNT(*) AS n
+                FROM academic_karma GROUP BY record_id
+            ) k ON k.record_id = ar.id
+            WHERE ar.user_id = $1
+            ORDER BY year DESC, term DESC", $user_id);
         $grouped = [];
         foreach ($result as $r) {
             $grouped[$r["year"]][$r["term"]][] = $r;
@@ -36,14 +46,22 @@ class AcademicsService {
         );
     }
 
-    public function insertRecord($user_id, $year, $term, $code, $name, $teammate, $project, $karma) {
-        $this->db->query(
-            "INSERT INTO academic_records (user_id, year, term, course_code, course_name, teammate_name, project_title, karma)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+    public function addRecord($user_id, $year, $term, $code, $name, $teammate, $project, $karma) {
+        $res[0] = $this->db->query(
+            "INSERT INTO academic_records
+            (user_id, year, term, course_code, course_name, teammate_name, project_title, karma)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING id",
             $user_id, $year, $term, $code, $name, $teammate, $project, $karma
         );
+        return $res[0][0]["id"]; // Fetch new record id
     }
 
+    public function deleteRecord($id) {
+        $this->db->query("DELETE FROM academic_records WHERE id = $1", $id);
+    }
+
+    // Projects
 
     public function updateProject($user_id, $project_id, $title, $desc) {
         $this->db->query(
@@ -60,8 +78,104 @@ class AcademicsService {
         );
     }
 
+    public function deleteProject($id) {
+        $this->db->query("DELETE FROM academic_records WHERE id = $1", $id);
+    }
+
+    // Goals
+
     public function updateGoal($user_id, $goal_text) {
         $this->db->query("DELETE FROM future_goals WHERE user_id = $1", $user_id); // allow only one for now
         $this->db->query("INSERT INTO future_goals (user_id, goal_description) VALUES ($1, $2)", $user_id, $goal_text);
     }
+
+    // Teammates
+
+    public function addTeammates($recordId, array $teammateIds) {
+        foreach ($teammateIds as $uid) {
+            $this->db->query(
+                "INSERT INTO academic_teammates (record_id, teammate_id)
+                VALUES ($1, $2) ON CONFLICT DO NOTHING",
+                $recordId, $uid
+            );
+        }
+        $res = $this->db->query(
+            "SELECT * FROM academic_teammates"
+        );
+    }
+
+    public function getTeammates($recordId){
+        return $this->db->query(
+            "SELECT u.id, u.name
+            FROM academic_teammates t
+            JOIN hoos_there_users u ON u.id = t.teammate_id
+            WHERE t.record_id = $1
+            ORDER BY u.name", $recordId
+        );
+    }
+    
+
+    public function userIsTeammate($recordId, $userId) {
+        $res = $this->db->query(
+            "SELECT * FROM academic_teammates
+            WHERE record_id = $1 AND teammate_id = $2 LIMIT 1",
+            $recordId, $userId
+        );
+        return !empty($this->db->query(
+            "SELECT 1 FROM academic_teammates
+            WHERE record_id = $1 AND teammate_id = $2 LIMIT 1",
+            $recordId, $userId
+        ));
+    }
+
+    // Karma
+
+    public function saveKarma($recordId, $raterId, $points) {
+        $this->db->query(
+            "INSERT INTO academic_karma (record_id, rater_id, points)
+            VALUES ($1,$2,$3)
+            ON CONFLICT (record_id, rater_id)
+            DO UPDATE SET points = $3",
+            $recordId, $raterId, $points
+        );
+        // find record owner -> refresh their karma cache
+        $owner = $this->db->query(
+            "SELECT user_id FROM academic_records WHERE id = $1", $recordId
+        )[0]["user_id"];
+        $this->recomputeUserKarma($owner);
+    }
+
+    public function getKarmaSummary($recordId, $viewerId=null){
+        $base = $this->db->query(
+            "SELECT COUNT(*) AS n, COALESCE(AVG(points),0)::numeric(10,3) AS avg
+               FROM academic_karma WHERE record_id = $1", $recordId)[0];
+        if ($viewerId){
+            $mine = $this->db->query(
+                "SELECT points FROM academic_karma WHERE record_id=$1 AND rater_id=$2 LIMIT 1",
+                $recordId, $viewerId);
+            $base["my"] = $mine ? $mine[0]["points"] : null;
+        }
+        return $base;
+    }
+
+    public function recomputeUserKarma(int $ownerId) : array{
+        $row = $this->db->query(
+            "SELECT COALESCE(AVG(points),0)::numeric(10,3) AS avg,
+                    COUNT(points) AS votes
+               FROM academic_records r
+               LEFT JOIN academic_karma k ON k.record_id = r.id
+              WHERE r.user_id = $1",
+            $ownerId
+        )[0];
+    
+        $this->db->query(
+            "UPDATE hoos_there_users
+                SET karma_avg   = $1,
+                    karma_votes = $2
+              WHERE id = $3",
+            $row["avg"], $row["votes"], $ownerId
+        );
+        return $row;
+    }
+    
 }

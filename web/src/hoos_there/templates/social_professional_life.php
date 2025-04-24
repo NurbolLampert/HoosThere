@@ -21,10 +21,65 @@
       border-bottom: 1px solid #dee2e6;
     }
   </style>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/social-professional.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
+    integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"
+  ></script>
+  <script>
+    $(document).ready(function() {
+      $('#update-socials-form').on('submit', function () {
+        updateSocialLinks();
+        return false;
+      });
+
+      $('#add-exp-form').on('submit', function () {
+        addExperience();
+        return false;
+      });
+
+      $("button.update-exp-btn").on('click', function () {
+        updateExperience($(this).dataset.id);
+      });
+
+      $("#add-edu-form").on('submit', function () {
+        addEducation();
+        return false;
+      });
+        
+      $("button.update-edu-btn").on('click', function () {
+        updateEducation($(this).dataset.id);
+      });
+
+      $("#add-club-form").on('submit', function () {
+        addClub();
+        return false;
+      });
+        
+      $("button.update-club-btn").on('click', function () {
+        updateClub($(this).dataset.id);
+      });
+
+      $("#add-vol-form").on('submit', function () {
+        addVolunteer();
+        return false;
+      });
+        
+      $("button.update-vol-btn").on('click', function () {
+        updateVolunteer($(this).dataset.id);
+      });
+    });
+  </script>
 </head>
 <body>
   <?php $this->showTemplate("navbar.php"); ?>
   <main class="container my-5">
+
+    <div id="social-alerts">
+      <?=$this->showAlert()?>
+    </div>
     
     <!-- Social Media Section -->
     <section class="form-section">
@@ -33,8 +88,7 @@
           <h2 class="h4 mb-0">Social Media</h2>
         </div>
         <div class="card-body">
-          <?=$this->showAlert()?>
-          <form method="post" action="?command=update_social_links">
+          <form id="update-socials-form">
             <div class="row g-3">
               <div class="col-md-4">
                 <label for="instagram" class="form-label">Instagram</label>
@@ -299,6 +353,7 @@
   <footer class="text-center py-3">
     <p>&copy; 2025 Hoo’s There Project</p>
   </footer>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

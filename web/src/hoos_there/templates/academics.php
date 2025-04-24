@@ -15,67 +15,12 @@
     <?=$this->showAlert()?>
 
     <!-- Outer Accordion by Year -->
-    <div class="accordion" id="yearAccordion">
-      <?php foreach ($academic_data["grouped"] as $year => $terms): ?>
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="headingYear<?=$year?>">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseYear<?=$year?>">
-              Year <?=htmlspecialchars($year)?>
-            </button>
-          </h2>
-          <div id="collapseYear<?=$year?>" class="accordion-collapse collapse" data-bs-parent="#yearAccordion">
-            <div class="accordion-body">
-              <div class="accordion" id="accordionYear<?=$year?>Terms">
-                <?php foreach ($terms as $term => $records): ?>
-                  <div class="accordion-item">
-                    <h3 class="accordion-header" id="heading<?=$year?><?=$term?>">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?=$year?><?=$term?>">
-                        <?=$term?> Term
-                      </button>
-                    </h3>
-                    <div id="collapse<?=$year?><?=$term?>" class="accordion-collapse collapse" data-bs-parent="#accordionYear<?=$year?>Terms">
-                      <div class="accordion-body">
-                        <ul>
-                          <?php foreach ($records as $record): ?>
-                            <li>
-                              <form class="row g-2 align-items-center mb-2" method="post" action="?command=update_record">
-                                <input type="hidden" name="record_id" value="<?=htmlspecialchars($record["id"])?>">
-                                <div class="col-auto">
-                                  <input name="course_code" class="form-control" value="<?=htmlspecialchars($record["course_code"])?>">
-                                </div>
-                                <div class="col-auto">
-                                  <input name="course_name" class="form-control" value="<?=htmlspecialchars($record["course_name"])?>">
-                                </div>
-                                <div class="col-auto">
-                                  <input name="teammate_name" class="form-control" value="<?=htmlspecialchars($record["teammate_name"])?>" placeholder="Teammate">
-                                </div>
-                                <div class="col-auto">
-                                  <input name="project_title" class="form-control" value="<?=htmlspecialchars($record["project_title"])?>" placeholder="Project Title">
-                                </div>
-                                <div class="col-auto">
-                                  <input name="karma" class="form-control" type="number" min="1" max="10" value="<?=htmlspecialchars($record["karma"])?>">
-                                </div>
-                                <div class="col-auto">
-                                  <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
-                                </div>
-                              </form>
-                            </li>
-                          <?php endforeach; ?>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-              </div>
-            </div>
-          </div>
-        </div>
-      <?php endforeach; ?>
-    </div>
+    <?php include($this->include_path . "/templates/academic_records.php"); ?>
+    <!-- Accordion End -->
 
     <!-- Button to toggle Add Record form -->
     <div class="pt-3">
-        <button class="btn btn-success mb-3" onclick="document.getElementById('add-record-form').classList.toggle('d-none')">+ Add New Record</button>
+        <button class="btn btn-outline-success mb-3" id="add-record">+ Add New Record</button>
     </div>
 
 
@@ -96,30 +41,31 @@
             <option value="Summer">Summer</option>
           </select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
           <label for="course_code">Course Code</label>
-          <input type="text" name="course_code" class="form-control" required>
+          <input type="text" name="course_code" id="course_code" class="form-control" required>
         </div>
-        <div class="col-md-5">
+        <div class="col-md-3">
           <label for="course_name">Course Name</label>
-          <input type="text" name="course_name" class="form-control" required>
+          <input type="text" name="course_name" id="course_name" class="form-control" required>
         </div>
-      </div>
-      <div class="row mt-2">
-        <div class="col-md-4">
-          <label for="teammate_name">Teammate (optional)</label>
-          <input type="text" name="teammate_name" class="form-control">
-        </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
           <label for="project_title">Project Title (optional)</label>
-          <input type="text" name="project_title" class="form-control">
-        </div>
-        <div class="col-md-4">
-          <label for="karma">Karma (1-10)</label>
-          <input type="number" name="karma" class="form-control" min="1" max="10">
+          <input type="text" name="project_title" id="project_title" class="form-control">
         </div>
       </div>
-      <button type="submit" class="btn btn-primary mt-3">Save Record</button>
+      
+      <!-- Pick Teammates -->
+      <div class="row mt-2">
+        <div class="col-md-6 position-relative teammate-search-parent">
+          <label class="form-label">Teammates (optional)</label>
+          <input type="text" id="newTeammateInput" class="form-control" placeholder="Lookup user…">
+          <!-- Show selected teammates -->
+          <div id="newTeammateTags" class="mt-1"></div>
+          <input type="hidden" name="teammate_ids" id="newTeammateIds" value="">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-success btn-sm mt-3">Add Record</button>
     </form>
 
     <hr>
@@ -155,6 +101,12 @@
                 </div>
                 <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
             </form>
+
+            <!-- Delete Form -->
+            <form method="post" action="?command=delete_project&id=<?=$project['id']?>">
+              <input type="hidden" name="confirm" value="1">
+              <button type="submit" class="mt-2 btn btn-danger btn-sm">Delete Project</button>
+            </form>
             </div>
         </div>
         </div>
@@ -183,29 +135,23 @@
     </div>
     </section>
 
-
-
     <hr>
 
     <!-- Future Goals Section -->
     <section class="mt-4">
-        <h2 class="fs-3">Future Goals</h2>
+      <h2 class="fs-3">Future Goals</h2>
 
-        <?php if (!empty($academic_data["goals"])): ?>
-            <p><?=htmlspecialchars($academic_data["goals"][0]["goal_description"] ?? '')?></p>
-        <?php else: ?>
-            <p>No goals set.</p>
-        <?php endif; ?>
+      <?php $goals = htmlspecialchars($academic_data["goals"][0]["goal_description"] ?? '');?>
 
-        <form method="post" action="?command=update_goals" class="mt-3">
-            <div class="mb-3">
-            <textarea name="goal_description" rows="3" class="form-control" placeholder="Describe your future goals"><?=htmlspecialchars($academic_data["goals"][0]["goal_description"] ?? '')?></textarea>
-            </div>
-            <button class="btn btn-outline-primary" type="submit">Save Goals</button>
-        </form>
-        </section>
-
-
+      <form method="post" action="?command=update_goals" class="mt-3">
+          <div class="mb-3">
+          <textarea
+            name="goal_description" rows="3" class="form-control"
+            placeholder="Describe your future goals here."><?=$goals?></textarea>
+          </div>
+          <button class="btn btn-outline-primary" type="submit">Save Goals</button>
+      </form>
+    </section>
   </main>
 
   <footer class="text-center py-3">
@@ -213,5 +159,18 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="scripts/teammate-picker.js"></script>
+  <script src="scripts/add-record-picker.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
+    integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"
+  ></script>
+  <script>
+    $(document).ready(function() {
+      $('button#add-record').on('click', function () {
+        $('form#add-record-form').toggleClass('d-none')
+      });
+    });
+  </script>
 </body>
 </html>
