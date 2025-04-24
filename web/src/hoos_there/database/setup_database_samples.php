@@ -2,40 +2,41 @@
 
 /* ---------- 1. USERS  ---------------------------------------------------- */
 $usrSQL = "INSERT INTO hoos_there_users
-             (id, email, password, name,
+             (email, password, name,
               year, major, hometown, description,
               karma_avg, karma_votes)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,0,0)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,0,0)
            ON CONFLICT (id) DO NOTHING";
 
+// IDs 5-14
 $rawUsers = [
- // id, email,               password,      name,            year, major, hometown, description
- [5,'alice@virginia.edu',       'Password1!',  'Alice Zhang',   2026,'Computer Science','Richmond, VA',
+ // email,               password,      name,            year, major, hometown, description
+ ['alice@virginia.edu',       'Password1!',  'Alice Zhang',   2026,'Computer Science','Richmond, VA',
   'CS major who loves full-stack dev and coffee.'],
- [6,'brandon@virginia.edu',     'Password1!',  'Brandon Lee',   2025,'Economics','Fairfax, VA',
+ ['brandon@virginia.edu',     'Password1!',  'Brandon Lee',   2025,'Economics','Fairfax, VA',
   'Aspiring consultant; debates for fun.'],
- [7,'carmen@virginia.edu',      'Password1!',  'Carmen Ortiz',  2026,'Statistics','Norfolk, VA',
+ ['carmen@virginia.edu',      'Password1!',  'Carmen Ortiz',  2026,'Statistics','Norfolk, VA',
   'Data nerd & salsa dancer.'],
- [8,'diego@virginia.edu',       'Password1!',  'Diego Martínez',2024,'Mechanical Eng.','Roanoke, VA',
+ ['diego@virginia.edu',       'Password1!',  'Diego Martínez',2024,'Mechanical Eng.','Roanoke, VA',
   'Robotics team lead.'],
- [9,'emma@virginia.edu',        'Password1!',  'Emma Johnson',  2025,'Biology','Charlottesville, VA',
+ ['emma@virginia.edu',        'Password1!',  'Emma Johnson',  2025,'Biology','Charlottesville, VA',
   'Pre-med researching CRISPR.'],
- [10,'farah@virginia.edu',       'Password1!',  'Farah Ali',     2025,'Psychology','Alexandria, VA',
+ ['farah@virginia.edu',       'Password1!',  'Farah Ali',     2025,'Psychology','Alexandria, VA',
   'UX enthusiast & peer counselor.'],
- [11,'gavin@virginia.edu',       'Password1!',  'Gavin Patel',   2026,'Computer Science','Herndon, VA',
+ ['gavin@virginia.edu',       'Password1!',  'Gavin Patel',   2026,'Computer Science','Herndon, VA',
   'Competitive programmer, coffee addict.'],
- [12,'hannah@virginia.edu',      'Password1!',  'Hannah Kim',    2024,'Architecture','Richmond, VA',
+ ['hannah@virginia.edu',      'Password1!',  'Hannah Kim',    2024,'Architecture','Richmond, VA',
   'Urban design + watercolor sketches.'],
- [13,'ivan@virginia.edu',        'Password1!',  'Ivan Petrov',   2026,'Math','Moscow, Russia',
+ ['ivan@virginia.edu',        'Password1!',  'Ivan Petrov',   2026,'Math','Moscow, Russia',
   'Number theory & chess club captain.'],
-[14,'julia@virginia.edu',       'Password1!',  'Julia Nguyen',  2025,'Commerce','Virginia Beach, VA',
+ ['julia@virginia.edu',       'Password1!',  'Julia Nguyen',  2025,'Commerce','Virginia Beach, VA',
   'Marketing analytics & foodie.']
 ];
 
 foreach ($rawUsers as $u) {
-    [$id,$email,$plain,$name,$year,$major,$town,$desc] = $u;
-    $hash = password_hash($plain,PASSWORD_DEFAULT);
-    pg_query_params($dbHandle,$usrSQL,[$id,$email,$hash,$name,$year,$major,$town,$desc]);
+  [$email,$plain,$name,$year,$major,$town,$desc] = $u;
+  $hash = password_hash($plain,PASSWORD_DEFAULT);
+  pg_query_params($dbHandle,$usrSQL,[$email,$hash,$name,$year,$major,$town,$desc]);
 }
 
 /* ---------- 2. helper to insert many rows parameterized ------------------ */
